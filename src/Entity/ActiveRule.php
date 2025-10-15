@@ -30,6 +30,9 @@ class ActiveRule
     #[ORM\ManyToOne]
     private ?Person $createdBy = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $ip = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +94,18 @@ class ActiveRule
     public function setCreatedBy(?Person $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getIp(): ?string
+    {
+        return $this->ip;
+    }
+
+    public function setIp(string $ip): static
+    {
+        $this->ip = $ip;
 
         return $this;
     }

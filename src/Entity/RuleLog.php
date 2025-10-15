@@ -28,6 +28,12 @@ class RuleLog
     #[ORM\ManyToOne]
     private ?Person $deletedBy = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $createdIp = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $deletedIp = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +95,30 @@ class RuleLog
     public function setDeletedBy(?Person $deletedBy): static
     {
         $this->deletedBy = $deletedBy;
+
+        return $this;
+    }
+
+    public function getCreatedIp(): ?string
+    {
+        return $this->createdIp;
+    }
+
+    public function setCreatedIp(string $createdIp): static
+    {
+        $this->createdIp = $createdIp;
+
+        return $this;
+    }
+
+    public function getDeletedIp(): ?string
+    {
+        return $this->deletedIp;
+    }
+
+    public function setDeletedIp(string $deletedIp): static
+    {
+        $this->deletedIp = $deletedIp;
 
         return $this;
     }
