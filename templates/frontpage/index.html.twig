@@ -1,5 +1,10 @@
 {% extends 'layout.html.twig' %}
 
+{% block meta %}
+{{ parent() }}
+<meta http-equiv="refresh" content="15">
+{% endblock %}
+
 {% block content %}
     <h1 class="display-1">{{ app_name }}</h1>
     {% if not networks %}

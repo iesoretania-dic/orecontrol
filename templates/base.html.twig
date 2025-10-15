@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% block meta %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% endblock %}
         <title>{% block title %}{{ app_name }}{% endblock %}</title>
         {% block stylesheets %}
         {% endblock %}
