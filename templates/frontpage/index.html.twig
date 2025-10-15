@@ -1,5 +1,48 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <h1>{{ app_name }}</h1>
+    <h1 class="display-1">{{ app_name }}</h1>
+    {% if not networks %}
+        <h2>No tiene acceso al control de ningún aula. (IP: {{ ip }})</h2>
+    {% else %}
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for network in networks %}
+                {% set managed = network in networks_managed %}
+                {% if managed %}
+                    {% set class = network.activeRule ? 'text-bg-warning' : 'text-bg-success' %}
+                {% else %}
+                    {% set class = network.activeRule ? 'border-warning' : 'border-success' %}
+                {% endif %}
+                <div class="col">
+                    <div class="card {{ class }} h-100 network-group">
+                        <div class="card-header"><h2>{{ network.name }}</h2></div>
+                        <div class="card-body">
+                            {% if managed %}
+                                <button type="submit" class="btn btn-{{ network.activeRule ? 'light' : 'dark' }} btn w-100 mb-2">Acceso completo</button>
+                                {% for rule_group in rule_groups %}
+                                    {% if not network.activeRule %}
+                                        {% set active = false %}
+                                    {% else %}
+                                        {% set active = network.activeRule.ruleGroup == rule_group %}
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-{{ not active ? 'light' : 'dark' }} btn w-100 mb-2">{{ rule_group.name }}</button>
+                                {% endfor %}
+                            {% else %}
+                                {% if network.activeRule %}
+                                    <h4 class="card-text">{{ network.activeRule.ruleGroup.name }}</h4>
+                                {% else %}
+                                    <h4 class="card-text">Acceso completo</h4>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        {% if network.activeRule %}
+                            <div class="card-footer">
+                                Activado {{ network.activeRule.createdAt|ago  }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}
