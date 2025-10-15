@@ -18,15 +18,17 @@
                         <div class="card-header"><h2>{{ network.name }}</h2></div>
                         <div class="card-body">
                             {% if managed %}
-                                <button type="submit" class="btn btn-{{ network.activeRule ? 'light' : 'dark' }} btn w-100 mb-2">Acceso completo</button>
-                                {% for rule_group in rule_groups %}
-                                    {% if not network.activeRule %}
-                                        {% set active = false %}
-                                    {% else %}
-                                        {% set active = network.activeRule.ruleGroup == rule_group %}
-                                    {% endif %}
-                                    <button type="submit" class="btn btn-{{ not active ? 'light' : 'dark' }} btn w-100 mb-2">{{ rule_group.name }}</button>
-                                {% endfor %}
+                                <form action="{{ path('frontpage_update', {'id': network.id}) }}" method="post">
+                                    <button type="submit" class="btn btn-{{ network.activeRule ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group">Acceso completo</button>
+                                    {% for rule_group in rule_groups %}
+                                        {% if not network.activeRule %}
+                                            {% set active = false %}
+                                        {% else %}
+                                            {% set active = network.activeRule.ruleGroup == rule_group %}
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-{{ not active ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group" value="{{ rule_group.id }}">{{ rule_group.name }}</button>
+                                    {% endfor %}
+                                </form>
                             {% else %}
                                 {% if network.activeRule %}
                                     <h4 class="card-text">{{ network.activeRule.ruleGroup.name }}</h4>

@@ -33,4 +33,12 @@ class NetworkRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function save(Network $network, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($network);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }
