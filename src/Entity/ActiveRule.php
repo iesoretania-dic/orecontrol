@@ -21,10 +21,6 @@ class ActiveRule
 
     #[ORM\ManyToOne(inversedBy: 'activeRules')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Network $network = null;
-
-    #[ORM\ManyToOne(inversedBy: 'activeRules')]
-    #[ORM\JoinColumn(nullable: false)]
     private ?RuleGroup $ruleGroup = null;
 
     #[ORM\ManyToOne]
@@ -32,6 +28,9 @@ class ActiveRule
 
     #[ORM\Column(length: 255)]
     private ?string $ip = null;
+
+    #[ORM\OneToOne(mappedBy: 'activeRule', cascade: ['persist', 'remove'])]
+    private ?Network $network = null;
 
     public function getId(): ?int
     {
@@ -58,18 +57,6 @@ class ActiveRule
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
-
-        return $this;
-    }
-
-    public function getNetwork(): ?Network
-    {
-        return $this->network;
-    }
-
-    public function setNetwork(?Network $network): static
-    {
-        $this->network = $network;
 
         return $this;
     }
@@ -106,6 +93,28 @@ class ActiveRule
     public function setIp(string $ip): static
     {
         $this->ip = $ip;
+
+        return $this;
+    }
+
+    public function getNetwork(): ?Network
+    {
+        return $this->network;
+    }
+
+    public function setNetwork(?Network $network): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($network === null && $this->network !== null) {
+            $this->network->setActiveRule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($network !== null && $network->getActiveRule() !== $this) {
+            $network->setActiveRule($this);
+        }
+
+        $this->network = $network;
 
         return $this;
     }

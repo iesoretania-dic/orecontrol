@@ -27,15 +27,11 @@ class Network
     #[ORM\Column]
     private ?int $level = null;
 
-    /**
-     * @var Collection<int, ActiveRule>
-     */
-    #[ORM\OneToMany(targetEntity: ActiveRule::class, mappedBy: 'network')]
-    private Collection $activeRules;
+    #[ORM\OneToOne(inversedBy: 'network', cascade: ['persist', 'remove'])]
+    private ?ActiveRule $activeRule = null;
 
     public function __construct()
     {
-        $this->activeRules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -91,32 +87,14 @@ class Network
         return $this;
     }
 
-    /**
-     * @return Collection<int, ActiveRule>
-     */
-    public function getActiveRules(): Collection
+    public function getActiveRule(): ?ActiveRule
     {
-        return $this->activeRules;
+        return $this->activeRule;
     }
 
-    public function addActiveRule(ActiveRule $activeRule): static
+    public function setActiveRule(?ActiveRule $activeRule): static
     {
-        if (!$this->activeRules->contains($activeRule)) {
-            $this->activeRules->add($activeRule);
-            $activeRule->setNetwork($this);
-        }
-
-        return $this;
-    }
-
-    public function removeActiveRule(ActiveRule $activeRule): static
-    {
-        if ($this->activeRules->removeElement($activeRule)) {
-            // set the owning side to null (unless already changed)
-            if ($activeRule->getNetwork() === $this) {
-                $activeRule->setNetwork(null);
-            }
-        }
+        $this->activeRule = $activeRule;
 
         return $this;
     }
