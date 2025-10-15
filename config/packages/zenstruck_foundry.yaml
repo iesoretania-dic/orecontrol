@@ -1,13 +1,11 @@
-zenstruck_foundry:
-    faker:
-        locale: 'es'
-
 when@dev: &dev
     # See full configuration: https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#full-default-bundle-configuration
     zenstruck_foundry:
         persistence:
             # Flush only once per call of `PersistentObjectFactory::create()`
             flush_once: true
+        faker:
+            locale: 'es'
 
     #　If you use the `make:factory --test` command, you may need to uncomment the following.
     # See https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#generate
