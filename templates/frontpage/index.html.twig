@@ -10,7 +10,7 @@
     {% if not networks %}
         <h2>No tiene acceso al control de ningún aula. (IP: {{ ip }})</h2>
     {% else %}
-        <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="row row-cols-1 row-cols-md-5 g-4">
             {% for network in networks %}
                 {% set managed = network in networks_managed %}
                 {% if managed %}
