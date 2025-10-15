@@ -70,7 +70,12 @@ class RuleGroup
         return $this;
     }
 
-    public function setId(string $_id): static
+    public function get_id(): string
+    {
+        return $this->_id;
+    }
+
+    public function set_id(string $_id): static
     {
         $this->_id = $_id;
 

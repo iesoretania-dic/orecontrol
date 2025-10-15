@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Network;
 use App\Repository\NetworkRepository;
 use App\Repository\RuleGroupRepository;
+use App\Service\UniFiAPIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +18,7 @@ class FrontpageController extends AbstractController
     public function __construct(
         private NetworkRepository $networkRepository,
         private RuleGroupRepository $ruleGroupRepository,
+        private UniFiAPIService $uniFiAPIService
     ) {
     }
 
@@ -24,9 +26,12 @@ class FrontpageController extends AbstractController
     public function index(Request $request): Response
     {
         $ip = $request->getClientIp();
-        $networks = $this->networkRepository->findAllOrdered();
+        $allNetworks = $this->networkRepository->findAllOrdered();
         $networksManaged = $this->networkRepository->findByAllowedIp($ip);
         $ruleGroups = $this->ruleGroupRepository->findAllSelectable();
+
+        $networks = array_merge($networksManaged, $allNetworks);
+        $networks = array_unique($networks, SORT_REGULAR);
 
         return $this->render('frontpage/index.html.twig', [
             'networks' => $networks,
@@ -60,6 +65,8 @@ class FrontpageController extends AbstractController
             $network->setEnabledBy(null);
         }
         $this->networkRepository->save($network, true);
+
+        $this->uniFiAPIService->updateRuleGroups();
 
         return $this->redirectToRoute('frontpage');
     }
