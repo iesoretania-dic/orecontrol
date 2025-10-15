@@ -9,9 +9,9 @@
             {% for network in networks %}
                 {% set managed = network in networks_managed %}
                 {% if managed %}
-                    {% set class = network.activeRule ? 'text-bg-warning' : 'text-bg-success' %}
+                    {% set class = network.ruleGroup ? 'text-bg-warning' : 'text-bg-success' %}
                 {% else %}
-                    {% set class = network.activeRule ? 'border-warning' : 'border-success' %}
+                    {% set class = network.ruleGroup ? 'border-warning' : 'border-success' %}
                 {% endif %}
                 <div class="col">
                     <div class="card {{ class }} h-100 network-group">
@@ -19,27 +19,27 @@
                         <div class="card-body">
                             {% if managed %}
                                 <form action="{{ path('frontpage_update', {'id': network.id}) }}" method="post">
-                                    <button type="submit" class="btn btn-{{ network.activeRule ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group">Acceso completo</button>
+                                    <button type="submit" class="btn btn-{{ network.ruleGroup ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group">Acceso completo</button>
                                     {% for rule_group in rule_groups %}
-                                        {% if not network.activeRule %}
+                                        {% if not network.ruleGroup %}
                                             {% set active = false %}
                                         {% else %}
-                                            {% set active = network.activeRule.ruleGroup == rule_group %}
+                                            {% set active = network.ruleGroup == rule_group %}
                                         {% endif %}
                                         <button type="submit" class="btn btn-{{ not active ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group" value="{{ rule_group.id }}">{{ rule_group.name }}</button>
                                     {% endfor %}
                                 </form>
                             {% else %}
-                                {% if network.activeRule %}
-                                    <h4 class="card-text">{{ network.activeRule.ruleGroup.name }}</h4>
+                                {% if network.ruleGroup %}
+                                    <h4 class="card-text">{{ network.ruleGroup.name }}</h4>
                                 {% else %}
                                     <h4 class="card-text">Acceso completo</h4>
                                 {% endif %}
                             {% endif %}
                         </div>
-                        {% if network.activeRule %}
+                        {% if network.enabledAt %}
                             <div class="card-footer">
-                                Activado {{ network.activeRule.createdAt|ago  }}
+                                Activado {{ network.enabledAt|ago  }}
                             </div>
                         {% endif %}
                     </div>

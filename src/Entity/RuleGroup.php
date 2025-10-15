@@ -31,14 +31,14 @@ class RuleGroup
     private ?bool $selectable = null;
 
     /**
-     * @var Collection<int, ActiveRule>
+     * @var Collection<int, Network>
      */
-    #[ORM\OneToMany(targetEntity: ActiveRule::class, mappedBy: 'ruleGroup', orphanRemoval: true)]
-    private Collection $activeRules;
+    #[ORM\OneToMany(targetEntity: Network::class, mappedBy: 'ruleGroup')]
+    private Collection $networks;
 
     public function __construct()
     {
-        $this->activeRules = new ArrayCollection();
+        $this->networks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,29 +102,29 @@ class RuleGroup
     }
 
     /**
-     * @return Collection<int, ActiveRule>
+     * @return Collection<int, Network>
      */
-    public function getActiveRules(): Collection
+    public function getNetworks(): Collection
     {
-        return $this->activeRules;
+        return $this->networks;
     }
 
-    public function addActiveRule(ActiveRule $activeRule): static
+    public function addNetwork(Network $network): static
     {
-        if (!$this->activeRules->contains($activeRule)) {
-            $this->activeRules->add($activeRule);
-            $activeRule->setRuleGroup($this);
+        if (!$this->networks->contains($network)) {
+            $this->networks->add($network);
+            $network->setRuleGroup($this);
         }
 
         return $this;
     }
 
-    public function removeActiveRule(ActiveRule $activeRule): static
+    public function removeNetwork(Network $network): static
     {
-        if ($this->activeRules->removeElement($activeRule)) {
+        if ($this->networks->removeElement($network)) {
             // set the owning side to null (unless already changed)
-            if ($activeRule->getRuleGroup() === $this) {
-                $activeRule->setRuleGroup(null);
+            if ($network->getRuleGroup() === $this) {
+                $network->setRuleGroup(null);
             }
         }
 

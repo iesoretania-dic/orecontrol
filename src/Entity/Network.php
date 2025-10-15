@@ -27,8 +27,20 @@ class Network
     #[ORM\Column]
     private ?int $level = null;
 
-    #[ORM\OneToOne(inversedBy: 'network', cascade: ['persist', 'remove'])]
-    private ?ActiveRule $activeRule = null;
+    #[ORM\ManyToOne(inversedBy: 'networks')]
+    private ?RuleGroup $ruleGroup = null;
+
+    #[ORM\ManyToOne]
+    private ?Person $enabledBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $enabledAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $expiresAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $enabledIp = null;
 
     public function __construct()
     {
@@ -87,14 +99,62 @@ class Network
         return $this;
     }
 
-    public function getActiveRule(): ?ActiveRule
+    public function getRuleGroup(): ?RuleGroup
     {
-        return $this->activeRule;
+        return $this->ruleGroup;
     }
 
-    public function setActiveRule(?ActiveRule $activeRule): static
+    public function setRuleGroup(?RuleGroup $ruleGroup): static
     {
-        $this->activeRule = $activeRule;
+        $this->ruleGroup = $ruleGroup;
+
+        return $this;
+    }
+
+    public function getEnabledBy(): ?Person
+    {
+        return $this->enabledBy;
+    }
+
+    public function setEnabledBy(?Person $enabledBy): static
+    {
+        $this->enabledBy = $enabledBy;
+
+        return $this;
+    }
+
+    public function getEnabledAt(): ?\DateTimeImmutable
+    {
+        return $this->enabledAt;
+    }
+
+    public function setEnabledAt(?\DateTimeImmutable $enabledAt): static
+    {
+        $this->enabledAt = $enabledAt;
+
+        return $this;
+    }
+
+    public function getExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
+    {
+        $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    public function getEnabledIp(): ?string
+    {
+        return $this->enabledIp;
+    }
+
+    public function setEnabledIp(?string $enabledIp): static
+    {
+        $this->enabledIp = $enabledIp;
 
         return $this;
     }

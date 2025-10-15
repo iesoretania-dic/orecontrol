@@ -4,24 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\ActiveRule;
 use App\Entity\Network;
-use App\Repository\ActiveRuleRepository;
 use App\Repository\NetworkRepository;
 use App\Repository\RuleGroupRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use function Zenstruck\Foundry\factory;
 
 class FrontpageController extends AbstractController
 {
-
     public function __construct(
         private NetworkRepository $networkRepository,
         private RuleGroupRepository $ruleGroupRepository,
-        private ActiveRuleRepository $activeRuleRepository,
     ) {
     }
 
@@ -53,28 +48,19 @@ class FrontpageController extends AbstractController
 
         $ruleGroup = $this->ruleGroupRepository->find($request->request->get('rule_group'));
 
-        if ($network->getActiveRule()) {
-            $activeRule = $network->getActiveRule();
-            if ($ruleGroup === null) {
-                $this->activeRuleRepository->remove($network->getActiveRule());
-                $network->setActiveRule(null);
-            } else {
-                $activeRule->setRuleGroup($ruleGroup);
-                $this->activeRuleRepository->save($activeRule);
-            }
-            $this->networkRepository->save($network, true);
-        } else if ($ruleGroup !== null) {
-            $activeRule = new ActiveRule();
-            $activeRule->setNetwork($network);
-            $activeRule->setRuleGroup($ruleGroup);
+        $network->setRuleGroup($ruleGroup);
 
-            $network->setActiveRule($activeRule);
-            $activeRule->setCreatedAt(new \DateTimeImmutable());
-            $activeRule->setIp($ip);
-            $this->networkRepository->save($network, true);
-            $this->activeRuleRepository->save($activeRule, true);
+        if ($ruleGroup !== null) {
+            $network->setEnabledAt(new \DateTimeImmutable());
+            $network->setEnabledIp($ip);
+            $network->setEnabledBy(null);
+        } else {
+            $network->setEnabledAt(null);
+            $network->setEnabledIp(null);
+            $network->setEnabledBy(null);
         }
+        $this->networkRepository->save($network, true);
 
-        return $this->redirectToRoute('frontpage', []);
+        return $this->redirectToRoute('frontpage');
     }
 }
