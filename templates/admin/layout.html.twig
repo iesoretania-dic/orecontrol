@@ -11,6 +11,9 @@
                 <li class="nav-item">
                     <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_scheduled_task' ? 'active fw-bold' }}" href="{{ path('admin_scheduled_task_index') }}">Tareas programadas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_rule_log' ? 'active fw-bold' }}" href="{{ path('admin_rule_log_index') }}">Historial</a>
+                </li>
             </ul>
         </div>
     </nav>

@@ -1,0 +1,52 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="h3 mb-3">Historial de accesos</h1>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Aula</th>
+                <th>Regla</th>
+                <th>Activado</th>
+                <th>Desactivado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.network.name }}</td>
+                    <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
+                    <td>
+                        {{ log.createdAt|date('d/m/Y H:i') }}<br>
+                        <span class="text-body-secondary small">
+                            {% if log.createdBy %}
+                                {{ log.createdBy.username }}
+                            {% else %}
+                                IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if log.deletedAt %}
+                            {{ log.deletedAt|date('d/m/Y H:i') }}<br>
+                            <span class="text-body-secondary small">
+                                {% if log.deletedBy %}
+                                    {{ log.deletedBy.username }}
+                                {% else %}
+                                    IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                {% endif %}
+                            </span>
+                        {% else %}
+                            <span class="badge text-bg-success">Vigente</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-body-secondary">Todavía no hay cambios registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

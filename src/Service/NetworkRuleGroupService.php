@@ -7,18 +7,25 @@ namespace App\Service;
 use App\Entity\Network;
 use App\Entity\Person;
 use App\Entity\RuleGroup;
+use App\Entity\RuleLog;
 use App\Repository\NetworkRepository;
+use App\Repository\RuleLogRepository;
 
 class NetworkRuleGroupService
 {
     public function __construct(
         private readonly NetworkRepository $networkRepository,
+        private readonly RuleLogRepository $ruleLogRepository,
         private readonly UniFiAPIService $uniFiAPIService,
     ) {
     }
 
     public function assign(Network $network, ?RuleGroup $ruleGroup, ?Person $enabledBy, ?string $enabledIp): void
     {
+        if ($network->getRuleGroup() !== $ruleGroup) {
+            $this->logChange($network, $ruleGroup, $enabledBy, $enabledIp);
+        }
+
         $network->setRuleGroup($ruleGroup);
 
         if ($ruleGroup !== null) {
@@ -32,6 +39,32 @@ class NetworkRuleGroupService
         }
 
         $this->networkRepository->save($network, true);
+    }
+
+    /**
+     * Closes whatever period was open for the network (if any) and opens a new one, so
+     * rule_log always shows who/where activated or deactivated a rule, and when. A change
+     * made from an authorised IP without a logged-in teacher leaves the "who" side null.
+     */
+    private function logChange(Network $network, ?RuleGroup $ruleGroup, ?Person $actor, ?string $actorIp): void
+    {
+        $now = new \DateTimeImmutable();
+
+        $openLog = $this->ruleLogRepository->findOpenForNetwork($network);
+        if ($openLog !== null) {
+            $openLog->setDeletedAt($now);
+            $openLog->setDeletedBy($actor);
+            $openLog->setDeletedIp($actorIp);
+            $this->ruleLogRepository->save($openLog);
+        }
+
+        $newLog = new RuleLog();
+        $newLog->setNetwork($network);
+        $newLog->setRuleGroup($ruleGroup);
+        $newLog->setCreatedAt($now);
+        $newLog->setCreatedBy($actor);
+        $newLog->setCreatedIp($actorIp);
+        $this->ruleLogRepository->save($newLog);
     }
 
     /** Call once after applying all the changes of a batch. */
