@@ -2,6 +2,7 @@
 
 {% block body %}
     <div class="d-flex justify-content-end p-2 gap-3 small">
+        <a href="{{ path('rule_log_index') }}">Historial</a>
         {% if app.user %}
             <span class="text-body-secondary">{{ app.user.userIdentifier }}</span>
             {% if is_granted('ROLE_ADMIN') %}

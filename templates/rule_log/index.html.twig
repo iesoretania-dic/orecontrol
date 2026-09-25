@@ -1,0 +1,85 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <a href="{{ path('frontpage') }}">← Aulas</a>
+    <h1 class="h3 mb-3">Historial de accesos</h1>
+
+    {% if not networks %}
+        <h2 class="h5">No tiene acceso al historial de ningún aula.</h2>
+    {% else %}
+        {% if networks|length > 1 %}
+            <ul class="nav nav-pills mb-3">
+                {% for network in networks %}
+                    <li class="nav-item">
+                        <a class="nav-link {{ selected_network and selected_network.id == network.id ? 'active' }}" href="{{ path('rule_log_index', {network: network.id}) }}">{{ network.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <h2 class="h5">{{ selected_network.name }}</h2>
+        {% endif %}
+
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Regla</th>
+                    <th>Activado</th>
+                    <th>Desactivado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
+                        <td>
+                            {{ log.createdAt|date('d/m/Y H:i') }}<br>
+                            <span class="text-body-secondary small">
+                                {% if log.createdBy %}
+                                    {{ log.createdBy.username }}
+                                {% else %}
+                                    IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if log.deletedAt %}
+                                {{ log.deletedAt|date('d/m/Y H:i') }}<br>
+                                <span class="text-body-secondary small">
+                                    {% if log.deletedBy %}
+                                        {{ log.deletedBy.username }}
+                                    {% else %}
+                                        IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                    {% endif %}
+                                </span>
+                            {% else %}
+                                <span class="badge text-bg-success">Vigente</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-body-secondary">Todavía no hay cambios registrados.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if last_page > 1 %}
+            <nav class="d-flex justify-content-between align-items-center">
+                {% if page > 1 %}
+                    <a class="btn btn-outline-secondary btn-sm" href="{{ path('rule_log_index', {network: selected_network.id, page: page - 1}) }}">&laquo; Anterior</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+
+                <span class="text-body-secondary small">Página {{ page }} de {{ last_page }}</span>
+
+                {% if page < last_page %}
+                    <a class="btn btn-outline-secondary btn-sm" href="{{ path('rule_log_index', {network: selected_network.id, page: page + 1}) }}">Siguiente &raquo;</a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    {% endif %}
+{% endblock %}

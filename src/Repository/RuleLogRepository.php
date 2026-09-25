@@ -42,6 +42,43 @@ class RuleLogRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param Network[] $networks
+     */
+    public function countForNetworks(array $networks): int
+    {
+        if ($networks === []) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.network IN (:networks)')
+            ->setParameter('networks', $networks)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @param Network[] $networks
+     * @return RuleLog[]
+     */
+    public function findForNetworks(array $networks, int $offset, int $limit): array
+    {
+        if ($networks === []) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.network IN (:networks)')
+            ->setParameter('networks', $networks)
+            ->orderBy('r.createdAt', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(RuleLog $ruleLog, bool $flush = false): void
     {
         $this->getEntityManager()->persist($ruleLog);
