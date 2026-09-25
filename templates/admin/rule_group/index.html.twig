@@ -1,0 +1,68 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:shield-lock') }} Reglas</h1>
+        <a href="{{ path('admin_rule_group_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+            {{ ux_icon('bi:plus-lg') }} Nueva regla
+        </a>
+    </div>
+
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+        {{ ux_icon('bi:exclamation-triangle-fill') }}
+        Estas reglas deben corresponder a grupos de firewall que ya existan en el controlador UniFi
+        (mismo <code>site_id</code> e identificador). Crear o cambiar una aquí no crea nada en UniFi:
+        es responsabilidad del administrador mantener ambos sistemas sincronizados.
+    </div>
+
+    <div class="table-responsive-card">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Site ID</th>
+                        <th>Identificador UniFi</th>
+                        <th>Tipo</th>
+                        <th>Seleccionable</th>
+                        <th>Aulas asignadas</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ruleGroup in ruleGroups %}
+                        <tr>
+                            <td>{{ ruleGroup.name }}</td>
+                            <td><code>{{ ruleGroup.siteId }}</code></td>
+                            <td><code>{{ ruleGroup._id }}</code></td>
+                            <td>{{ ruleGroup.groupType }}</td>
+                            <td>
+                                {% if ruleGroup.selectable %}
+                                    {{ ux_icon('bi:check-lg', {class: 'text-success'}) }}
+                                {% else %}
+                                    {{ ux_icon('bi:dash', {class: 'text-body-secondary'}) }}
+                                {% endif %}
+                            </td>
+                            <td>{{ ruleGroup.networks|length }}</td>
+                            <td class="text-end text-nowrap">
+                                <a href="{{ path('admin_rule_group_edit', {id: ruleGroup.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                    {{ ux_icon('bi:pencil-fill') }}
+                                </a>
+                                <form action="{{ path('admin_rule_group_delete', {id: ruleGroup.id}) }}" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta regla?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_rule_group') }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        {{ ux_icon('bi:trash-fill') }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-body-secondary py-4">No hay reglas dadas de alta todavía.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

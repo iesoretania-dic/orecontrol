@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Network;
+use App\Entity\RuleGroup;
 use App\Entity\RuleLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -85,5 +86,16 @@ class RuleLogRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function existsForRuleGroup(RuleGroup $ruleGroup): bool
+    {
+        return (bool) $this->createQueryBuilder('r')
+            ->select('1')
+            ->andWhere('r.ruleGroup = :ruleGroup')
+            ->setParameter('ruleGroup', $ruleGroup)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

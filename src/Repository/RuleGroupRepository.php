@@ -25,4 +25,31 @@ class RuleGroupRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return RuleGroup[]
+     */
+    public function findAllOrdered(): array
+    {
+        return $this->createQueryBuilder('rg')
+            ->orderBy('rg.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function save(RuleGroup $ruleGroup, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($ruleGroup);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(RuleGroup $ruleGroup, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($ruleGroup);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

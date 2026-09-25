@@ -41,4 +41,12 @@ class NetworkRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function remove(Network $network, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($network);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 }

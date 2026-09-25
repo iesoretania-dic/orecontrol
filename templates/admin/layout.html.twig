@@ -9,6 +9,16 @@
             <div class="collapse navbar-collapse" id="adminNavbar">
                 <ul class="navbar-nav ms-auto gap-sm-2 py-2 py-sm-0">
                     <li class="nav-item">
+                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_network' ? 'active fw-bold' }}" href="{{ path('admin_network_index') }}">
+                            {{ ux_icon('bi:building') }} Aulas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_rule_group' ? 'active fw-bold' }}" href="{{ path('admin_rule_group_index') }}">
+                            {{ ux_icon('bi:shield-lock') }} Reglas
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_person' ? 'active fw-bold' }}" href="{{ path('admin_person_index') }}">
                             {{ ux_icon('bi:people-fill') }} Docentes
                         </a>

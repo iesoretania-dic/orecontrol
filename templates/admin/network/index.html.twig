@@ -1,0 +1,59 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:building') }} Aulas</h1>
+        <a href="{{ path('admin_network_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+            {{ ux_icon('bi:plus-lg') }} Nueva aula
+        </a>
+    </div>
+
+    <div class="table-responsive-card">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>IP autorizada</th>
+                        <th>Descripción de regla</th>
+                        <th>Nivel</th>
+                        <th>Estado actual</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for network in networks %}
+                        <tr>
+                            <td>{{ network.name }}</td>
+                            <td><code>{{ network.allowedIp }}</code></td>
+                            <td>{{ network.ruleDescription }}</td>
+                            <td>{{ network.level }}</td>
+                            <td>
+                                {% if network.ruleGroup %}
+                                    <span class="badge text-bg-warning">{{ network.ruleGroup.name }}</span>
+                                {% else %}
+                                    <span class="badge text-bg-success">Acceso completo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a href="{{ path('admin_network_edit', {id: network.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                    {{ ux_icon('bi:pencil-fill') }}
+                                </a>
+                                <form action="{{ path('admin_network_delete', {id: network.id}) }}" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta aula?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_network') }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        {{ ux_icon('bi:trash-fill') }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-body-secondary py-4">No hay aulas dadas de alta todavía.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

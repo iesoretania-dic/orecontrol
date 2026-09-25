@@ -1,0 +1,56 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="app-page-title h4 mb-3">
+        {{ ux_icon(is_new ? 'bi:plus-lg' : 'bi:pencil-fill') }}
+        {{ is_new ? 'Nueva regla' : 'Editar regla' }}
+    </h1>
+
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+        {{ ux_icon('bi:exclamation-triangle-fill') }}
+        El <code>site_id</code> y el identificador deben coincidir con un grupo de firewall que ya
+        exista en el controlador UniFi. Guardar aquí no lo crea allí.
+    </div>
+
+    {% for error in errors %}
+        <div class="alert alert-danger d-flex align-items-center gap-2">{{ ux_icon('bi:exclamation-triangle-fill') }} {{ error }}</div>
+    {% endfor %}
+
+    <div class="app-surface p-4 col-12 col-md-7 col-lg-6">
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('rule_group_form') }}">
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" id="name" name="name" value="{{ ruleGroup.name }}" class="form-control" required placeholder="Ej. Sin Internet">
+            </div>
+
+            <div class="mb-3">
+                <label for="site_id" class="form-label">Site ID (UniFi)</label>
+                <input type="text" id="site_id" name="site_id" value="{{ ruleGroup.siteId }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="unifi_id" class="form-label">Identificador UniFi (<code>_id</code>)</label>
+                <input type="text" id="unifi_id" name="unifi_id" value="{{ ruleGroup._id }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="group_type" class="form-label">Tipo de grupo</label>
+                <input type="text" id="group_type" name="group_type" value="{{ ruleGroup.groupType }}" class="form-control" required placeholder="Ej. address-group">
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" id="selectable" name="selectable" value="1" class="form-check-input" {{ ruleGroup.selectable or is_new ? 'checked' }}>
+                <label for="selectable" class="form-check-label">{{ ux_icon('bi:check-circle-fill') }} Seleccionable (aparece como opción en el control de aulas)</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                    {{ ux_icon('bi:check-lg') }} Guardar
+                </button>
+                <a href="{{ path('admin_rule_group_index') }}" class="btn btn-link">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

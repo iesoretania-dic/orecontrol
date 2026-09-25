@@ -1,0 +1,50 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="app-page-title h4 mb-3">
+        {{ ux_icon(is_new ? 'bi:plus-lg' : 'bi:pencil-fill') }}
+        {{ is_new ? 'Nueva aula' : 'Editar aula' }}
+    </h1>
+
+    {% for error in errors %}
+        <div class="alert alert-danger d-flex align-items-center gap-2">{{ ux_icon('bi:exclamation-triangle-fill') }} {{ error }}</div>
+    {% endfor %}
+
+    <div class="app-surface p-4 col-12 col-md-7 col-lg-6">
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('network_form') }}">
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" id="name" name="name" value="{{ network.name }}" class="form-control" required placeholder="Ej. 1º ASIR">
+            </div>
+
+            <div class="mb-3">
+                <label for="allowed_ip" class="form-label">IP autorizada</label>
+                <div class="input-group">
+                    <span class="input-group-text">{{ ux_icon('bi:hdd-network-fill') }}</span>
+                    <input type="text" id="allowed_ip" name="allowed_ip" value="{{ network.allowedIp }}" class="form-control" required placeholder="192.168.x.x">
+                </div>
+                <div class="form-text">El ordenador con esta IP puede controlar el aula sin necesidad de iniciar sesión.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="rule_description" class="form-label">Descripción de regla (UniFi)</label>
+                <input type="text" id="rule_description" name="rule_description" value="{{ network.ruleDescription }}" class="form-control" required>
+                <div class="form-text">Debe coincidir con el identificador de red usado en el controlador UniFi al formar los grupos de firewall.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="level" class="form-label">Nivel</label>
+                <input type="number" id="level" name="level" value="{{ network.level ?? 0 }}" class="form-control">
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                    {{ ux_icon('bi:check-lg') }} Guardar
+                </button>
+                <a href="{{ path('admin_network_index') }}" class="btn btn-link">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
