@@ -26,6 +26,7 @@
         "symfony/runtime": "7.3.*",
         "symfony/security-bundle": "7.3.*",
         "symfony/twig-bundle": "7.3.*",
+        "symfony/ux-icons": "^2.36",
         "symfony/ux-live-component": "^2.36",
         "symfony/yaml": "7.3.*",
         "twig/extra-bundle": "^2.12|^3.0",

@@ -1,73 +1,86 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <a href="{{ path('frontpage') }}">← Aulas</a>
-    <h1 class="h3 mb-3">Historial de accesos</h1>
+    {% include 'components/_local_navbar.html.twig' %}
+    <h1 class="app-page-title h4 mb-3">{{ ux_icon('bi:clock-history') }} Historial de accesos</h1>
 
     {% if not networks %}
-        <h2 class="h5">No tiene acceso al historial de ningún aula.</h2>
+        <div class="app-surface p-4 text-center">
+            {{ ux_icon('bi:wifi-off', {class: 'fs-1 text-body-secondary mb-2'}) }}
+            <h2 class="h5 mb-0">No tiene acceso al historial de ningún aula.</h2>
+        </div>
     {% else %}
         {% if networks|length > 1 %}
-            <ul class="nav nav-pills mb-3">
+            <div class="d-flex flex-wrap gap-2 mb-3">
                 {% for network in networks %}
-                    <li class="nav-item">
-                        <a class="nav-link {{ selected_network and selected_network.id == network.id ? 'active' }}" href="{{ path('rule_log_index', {network: network.id}) }}">{{ network.name }}</a>
-                    </li>
+                    {% set is_selected = selected_network and selected_network.id == network.id %}
+                    <a href="{{ path('rule_log_index', {network: network.id}) }}"
+                       class="btn btn-sm {{ is_selected ? 'btn-dark' : 'btn-outline-secondary' }} rounded-pill d-inline-flex align-items-center gap-1">
+                        {{ ux_icon('bi:door-closed-fill') }} {{ network.name }}
+                    </a>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
-            <h2 class="h5">{{ selected_network.name }}</h2>
+            <h2 class="h5 d-flex align-items-center gap-2">{{ ux_icon('bi:door-closed-fill') }} {{ selected_network.name }}</h2>
         {% endif %}
 
-        <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>Regla</th>
-                    <th>Activado</th>
-                    <th>Desactivado</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                    <tr>
-                        <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
-                        <td>
-                            {{ log.createdAt|date('d/m/Y H:i') }}<br>
-                            <span class="text-body-secondary small">
-                                {% if log.createdBy %}
-                                    {{ log.createdBy.username }}
-                                {% else %}
-                                    IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
-                                {% endif %}
-                            </span>
-                        </td>
-                        <td>
-                            {% if log.deletedAt %}
-                                {{ log.deletedAt|date('d/m/Y H:i') }}<br>
-                                <span class="text-body-secondary small">
-                                    {% if log.deletedBy %}
-                                        {{ log.deletedBy.username }}
+        <div class="table-responsive-card">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Regla</th>
+                            <th>Activado</th>
+                            <th>Desactivado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                            <tr>
+                                <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
+                                <td>
+                                    {{ log.createdAt|date('d/m/Y H:i') }}<br>
+                                    <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
+                                        {{ ux_icon(log.createdBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
+                                        {% if log.createdBy %}
+                                            {{ log.createdBy.username }}
+                                        {% else %}
+                                            IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if log.deletedAt %}
+                                        {{ log.deletedAt|date('d/m/Y H:i') }}<br>
+                                        <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
+                                            {{ ux_icon(log.deletedBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
+                                            {% if log.deletedBy %}
+                                                {{ log.deletedBy.username }}
+                                            {% else %}
+                                                IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                            {% endif %}
+                                        </span>
                                     {% else %}
-                                        IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                        <span class="badge text-bg-success d-inline-flex align-items-center gap-1">{{ ux_icon('bi:check-circle-fill') }} Vigente</span>
                                     {% endif %}
-                                </span>
-                            {% else %}
-                                <span class="badge text-bg-success">Vigente</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="3" class="text-center text-body-secondary">Todavía no hay cambios registrados.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-body-secondary py-4">Todavía no hay cambios registrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         {% if last_page > 1 %}
-            <nav class="d-flex justify-content-between align-items-center">
+            <nav class="d-flex justify-content-between align-items-center mt-3">
                 {% if page > 1 %}
-                    <a class="btn btn-outline-secondary btn-sm" href="{{ path('rule_log_index', {network: selected_network.id, page: page - 1}) }}">&laquo; Anterior</a>
+                    <a class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" href="{{ path('rule_log_index', {network: selected_network.id, page: page - 1}) }}">
+                        {{ ux_icon('bi:chevron-left') }} Anterior
+                    </a>
                 {% else %}
                     <span></span>
                 {% endif %}
@@ -75,7 +88,9 @@
                 <span class="text-body-secondary small">Página {{ page }} de {{ last_page }}</span>
 
                 {% if page < last_page %}
-                    <a class="btn btn-outline-secondary btn-sm" href="{{ path('rule_log_index', {network: selected_network.id, page: page + 1}) }}">Siguiente &raquo;</a>
+                    <a class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" href="{{ path('rule_log_index', {network: selected_network.id, page: page + 1}) }}">
+                        Siguiente {{ ux_icon('bi:chevron-right') }}
+                    </a>
                 {% else %}
                     <span></span>
                 {% endif %}

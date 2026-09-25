@@ -1,52 +1,58 @@
 {% extends 'admin/layout.html.twig' %}
 
 {% block admin_content %}
-    <h1 class="h3 mb-3">Historial de accesos</h1>
+    <h1 class="app-page-title h4 mb-3">{{ ux_icon('bi:clock-history') }} Historial de accesos</h1>
 
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Aula</th>
-                <th>Regla</th>
-                <th>Activado</th>
-                <th>Desactivado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for log in logs %}
-                <tr>
-                    <td>{{ log.network.name }}</td>
-                    <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
-                    <td>
-                        {{ log.createdAt|date('d/m/Y H:i') }}<br>
-                        <span class="text-body-secondary small">
-                            {% if log.createdBy %}
-                                {{ log.createdBy.username }}
-                            {% else %}
-                                IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>
-                        {% if log.deletedAt %}
-                            {{ log.deletedAt|date('d/m/Y H:i') }}<br>
-                            <span class="text-body-secondary small">
-                                {% if log.deletedBy %}
-                                    {{ log.deletedBy.username }}
+    <div class="table-responsive-card">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Aula</th>
+                        <th>Regla</th>
+                        <th>Activado</th>
+                        <th>Desactivado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.network.name }}</td>
+                            <td>{{ log.ruleGroup ? log.ruleGroup.name : 'Acceso completo' }}</td>
+                            <td>
+                                {{ log.createdAt|date('d/m/Y H:i') }}<br>
+                                <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
+                                    {{ ux_icon(log.createdBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
+                                    {% if log.createdBy %}
+                                        {{ log.createdBy.username }}
+                                    {% else %}
+                                        IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if log.deletedAt %}
+                                    {{ log.deletedAt|date('d/m/Y H:i') }}<br>
+                                    <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
+                                        {{ ux_icon(log.deletedBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
+                                        {% if log.deletedBy %}
+                                            {{ log.deletedBy.username }}
+                                        {% else %}
+                                            IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                        {% endif %}
+                                    </span>
                                 {% else %}
-                                    IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                    <span class="badge text-bg-success d-inline-flex align-items-center gap-1">{{ ux_icon('bi:check-circle-fill') }} Vigente</span>
                                 {% endif %}
-                            </span>
-                        {% else %}
-                            <span class="badge text-bg-success">Vigente</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="4" class="text-center text-body-secondary">Todavía no hay cambios registrados.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-body-secondary py-4">Todavía no hay cambios registrados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

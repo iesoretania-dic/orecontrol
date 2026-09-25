@@ -1,3 +1,126 @@
-.network-group {
-    min-height: 18em
+:root {
+    --app-font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --app-bg: #f3f5f4;
+    --app-surface: #ffffff;
+    --app-border: #e2e6e4;
+    --app-radius: 0.75rem;
+    --app-shadow: 0 1px 2px rgba(16, 24, 20, 0.06), 0 1px 6px rgba(16, 24, 20, 0.05);
+    --app-shadow-hover: 0 6px 16px rgba(16, 24, 20, 0.12);
+    --app-brand: #2f5233;
+    --app-brand-dark: #203a25;
+}
+
+body {
+    font-family: var(--app-font);
+    background-color: var(--app-bg);
+    color: #212529;
+}
+
+/* Top navbar (main layout + admin layout share this look) */
+.app-navbar {
+    background-color: var(--app-surface);
+    border-bottom: 1px solid var(--app-border);
+}
+
+.app-navbar .navbar-brand {
+    font-weight: 700;
+    color: var(--app-brand);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.app-navbar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.app-navbar .nav-link.active,
+.app-navbar .nav-link:hover {
+    color: var(--app-brand);
+}
+
+.app-page-title {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Network status cards */
+.network-card {
+    border: 1px solid var(--app-border);
+    border-top: 4px solid var(--bs-secondary);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    background-color: var(--app-surface);
+}
+
+.network-card--open {
+    border-top-color: var(--bs-success);
+}
+
+.network-card--restricted {
+    border-top-color: var(--bs-warning);
+}
+
+.network-card--managed:hover {
+    box-shadow: var(--app-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.network-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--app-border);
+    font-weight: 600;
+}
+
+.network-card .card-footer {
+    background-color: transparent;
+    border-top: 1px solid var(--app-border);
+    color: #6c757d;
+}
+
+.network-card .btn {
+    text-align: left;
+}
+
+.network-card__status-icon {
+    font-size: 1.1rem;
+}
+
+.network-card--open .network-card__status-icon {
+    color: var(--bs-success);
+}
+
+.network-card--restricted .network-card__status-icon {
+    color: var(--bs-warning-text-emphasis, #997404);
+}
+
+/* Generic surface used by login/admin forms */
+.app-surface {
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+}
+
+.table-responsive-card {
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+    overflow: hidden;
+}
+
+.table-responsive-card table {
+    margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+    .app-page-title {
+        font-size: 1.5rem;
+    }
 }

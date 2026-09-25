@@ -1,6 +1,8 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <h1 class="display-1">{{ app_title }}</h1>
+    <h1 class="app-page-title h2 mb-4 d-flex align-items-center gap-2">
+        {{ ux_icon('bi:router-fill', {class: 'text-body-secondary'}) }} {{ app_title }}
+    </h1>
     {{ component('NetworkGrid') }}
 {% endblock %}

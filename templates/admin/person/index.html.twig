@@ -1,49 +1,69 @@
 {% extends 'admin/layout.html.twig' %}
 
 {% block admin_content %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Docentes</h1>
-        <a href="{{ path('admin_person_new') }}" class="btn btn-dark">Nuevo docente</a>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:people-fill') }} Docentes</h1>
+        <a href="{{ path('admin_person_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+            {{ ux_icon('bi:person-plus-fill') }} Nuevo docente
+        </a>
     </div>
 
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Nivel</th>
-                <th>Administrador</th>
-                <th>Autenticación</th>
-                <th>Estado</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for person in persons %}
-                <tr>
-                    <td>{{ person.username }}</td>
-                    <td>{{ person.level }}</td>
-                    <td>{{ person.manager ? 'Sí' : 'No' }}</td>
-                    <td>{{ person.external ? 'iSéneca' : 'Local' }}</td>
-                    <td>
-                        <span class="badge {{ person.active ? 'text-bg-success' : 'text-bg-secondary' }}">
-                            {{ person.active ? 'Activo' : 'Inactivo' }}
-                        </span>
-                    </td>
-                    <td class="text-end">
-                        <a href="{{ path('admin_person_edit', {id: person.id}) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-                        <form action="{{ path(person.active ? 'admin_person_deactivate' : 'admin_person_activate', {id: person.id}) }}" method="post" class="d-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_person') }}">
-                            <button type="submit" class="btn btn-sm btn-outline-{{ person.active ? 'danger' : 'success' }}">
-                                {{ person.active ? 'Desactivar' : 'Activar' }}
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="6" class="text-center text-body-secondary">No hay docentes dados de alta todavía.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive-card">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nivel</th>
+                        <th>Administrador</th>
+                        <th>Autenticación</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for person in persons %}
+                        <tr>
+                            <td>{{ person.username }}</td>
+                            <td>{{ person.level }}</td>
+                            <td>
+                                {% if person.manager %}
+                                    {{ ux_icon('bi:check-lg', {class: 'text-success'}) }}
+                                {% else %}
+                                    {{ ux_icon('bi:dash', {class: 'text-body-secondary'}) }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="d-inline-flex align-items-center gap-1">
+                                    {{ ux_icon(person.external ? 'bi:cloud-fill' : 'bi:house-fill') }}
+                                    {{ person.external ? 'iSéneca' : 'Local' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {{ person.active ? 'text-bg-success' : 'text-bg-secondary' }} d-inline-flex align-items-center gap-1">
+                                    {{ ux_icon(person.active ? 'bi:check-circle-fill' : 'bi:slash-circle') }}
+                                    {{ person.active ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a href="{{ path('admin_person_edit', {id: person.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                    {{ ux_icon('bi:pencil-fill') }}
+                                </a>
+                                <form action="{{ path(person.active ? 'admin_person_deactivate' : 'admin_person_activate', {id: person.id}) }}" method="post" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_person') }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-{{ person.active ? 'danger' : 'success' }}" title="{{ person.active ? 'Desactivar' : 'Activar' }}">
+                                        {{ ux_icon(person.active ? 'bi:slash-circle' : 'bi:check-circle') }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-body-secondary py-4">No hay docentes dados de alta todavía.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

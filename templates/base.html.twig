@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
         {% block meta %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#2f5233">
         {% endblock %}
         <title>{% block title %}{{ app_name }}{% endblock %}</title>
         {% block stylesheets %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         {% endblock %}
 
         {% block javascripts %}

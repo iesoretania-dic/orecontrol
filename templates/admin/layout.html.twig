@@ -1,28 +1,38 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <nav class="navbar navbar-expand navbar-light bg-light rounded mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('frontpage') }}">← Aulas</a>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_person' ? 'active fw-bold' }}" href="{{ path('admin_person_index') }}">Docentes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_scheduled_task' ? 'active fw-bold' }}" href="{{ path('admin_scheduled_task_index') }}">Tareas programadas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_rule_log' ? 'active fw-bold' }}" href="{{ path('admin_rule_log_index') }}">Historial</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    {% embed 'components/_local_navbar.html.twig' %}
+        {% block nav_extra %}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Mostrar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="adminNavbar">
+                <ul class="navbar-nav ms-auto gap-sm-2 py-2 py-sm-0">
+                    <li class="nav-item">
+                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_person' ? 'active fw-bold' }}" href="{{ path('admin_person_index') }}">
+                            {{ ux_icon('bi:people-fill') }} Docentes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_scheduled_task' ? 'active fw-bold' }}" href="{{ path('admin_scheduled_task_index') }}">
+                            {{ ux_icon('bi:calendar2-week-fill') }} Tareas programadas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_rule_log' ? 'active fw-bold' }}" href="{{ path('admin_rule_log_index') }}">
+                            {{ ux_icon('bi:clock-history') }} Historial
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endblock %}
+    {% endembed %}
 
     {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
+        <div class="alert alert-success d-flex align-items-center gap-2">{{ ux_icon('bi:check-circle-fill') }} {{ message }}</div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">{{ message }}</div>
+        <div class="alert alert-danger d-flex align-items-center gap-2">{{ ux_icon('bi:exclamation-triangle-fill') }} {{ message }}</div>
     {% endfor %}
 
     {% block admin_content %}{% endblock %}
