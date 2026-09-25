@@ -20,13 +20,13 @@
                             {% if managed %}
                                 <form action="{{ path('frontpage_update', {'id': network.id}) }}" method="post" class="d-grid gap-2">
                                     <input type="hidden" name="_token" value="{{ csrf_token('network_update') }}">
-                                    <button type="submit" class="btn btn-{{ network.ruleGroup ? 'outline-success' : 'success' }} d-flex align-items-center gap-2" name="rule_group">
-                                        {{ ux_icon('bi:wifi') }} Acceso completo
+                                    <button type="submit" class="btn btn-{{ network.ruleGroup ? 'outline-success' : 'success' }} d-flex align-items-start text-start gap-2" name="rule_group">
+                                        {{ ux_icon('bi:wifi', {class: 'flex-shrink-0 mt-1'}) }} <span>Acceso completo</span>
                                     </button>
                                     {% for rule_group in this.ruleGroups %}
                                         {% set active = network.ruleGroup and network.ruleGroup == rule_group %}
-                                        <button type="submit" class="btn btn-{{ active ? 'warning' : 'outline-warning' }} d-flex align-items-center gap-2" name="rule_group" value="{{ rule_group.id }}">
-                                            {{ ux_icon('bi:shield-lock') }} {{ rule_group.name }}
+                                        <button type="submit" class="btn btn-{{ active ? 'warning' : 'outline-warning' }} d-flex align-items-start text-start gap-2" name="rule_group" value="{{ rule_group.id }}">
+                                            {{ ux_icon('bi:shield-lock', {class: 'flex-shrink-0 mt-1'}) }} <span>{{ rule_group.name }}</span>
                                         </button>
                                     {% endfor %}
                                 </form>
