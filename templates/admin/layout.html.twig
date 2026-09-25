@@ -1,0 +1,26 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <nav class="navbar navbar-expand navbar-light bg-light rounded mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ path('frontpage') }}">← Aulas</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_person' ? 'active fw-bold' }}" href="{{ path('admin_person_index') }}">Docentes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'admin_scheduled_task' ? 'active fw-bold' }}" href="{{ path('admin_scheduled_task_index') }}">Tareas programadas</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    {% block admin_content %}{% endblock %}
+{% endblock %}

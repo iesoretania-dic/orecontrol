@@ -1,0 +1,4 @@
+auth.missing_credentials: 'Introduzca su usuario y contraseña.'
+auth.invalid_credentials: 'Usuario o contraseña incorrectos.'
+auth.user_inactive: 'Esta cuenta está desactivada.'
+auth.external_unavailable: 'El servicio de autenticación de iSéneca no está disponible en este momento.'

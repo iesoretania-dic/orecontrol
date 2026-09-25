@@ -1,0 +1,65 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="h3 mb-3">{{ is_new ? 'Nueva tarea programada' : 'Editar tarea programada' }}</h1>
+
+    {% for error in errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+
+    <form method="post" class="col-12 col-md-7">
+        <input type="hidden" name="_token" value="{{ csrf_token('scheduled_task_form') }}">
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" id="name" name="name" value="{{ task.name }}" class="form-control" required placeholder="Ej. Desactivar filtros los recreos">
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" id="all_networks" name="all_networks" value="1" class="form-check-input" {{ task.allNetworks ? 'checked' }}>
+            <label for="all_networks" class="form-check-label">Aplicar a todas las aulas</label>
+        </div>
+
+        <div class="mb-3">
+            <label for="networks" class="form-label">Aulas (si no se marca "todas")</label>
+            <select id="networks" name="networks[]" multiple class="form-select" size="6">
+                {% for network in networks %}
+                    <option value="{{ network.id }}" {{ network in task.networks ? 'selected' }}>{{ network.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="target_rule_group" class="form-label">Acción a aplicar</label>
+            <select id="target_rule_group" name="target_rule_group" class="form-select">
+                <option value="">Acceso completo (desactivar filtros)</option>
+                {% for rule_group in rule_groups %}
+                    <option value="{{ rule_group.id }}" {{ task.targetRuleGroup and task.targetRuleGroup.id == rule_group.id ? 'selected' }}>{{ rule_group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label d-block">Días de la semana</label>
+            {% for value, label in weekday_labels %}
+                <div class="form-check form-check-inline">
+                    <input type="checkbox" id="weekday_{{ value }}" name="weekdays[]" value="{{ value }}" class="form-check-input" {{ value in task.weekdays ? 'checked' }}>
+                    <label for="weekday_{{ value }}" class="form-check-label">{{ label }}</label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3 col-4">
+            <label for="time" class="form-label">Hora</label>
+            <input type="time" id="time" name="time" value="{{ task.time ? task.time|date('H:i') : '' }}" class="form-control" required>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" id="enabled" name="enabled" value="1" class="form-check-input" {{ task.enabled or is_new ? 'checked' }}>
+            <label for="enabled" class="form-check-label">Activa</label>
+        </div>
+
+        <button type="submit" class="btn btn-dark">Guardar</button>
+        <a href="{{ path('admin_scheduled_task_index') }}" class="btn btn-link">Cancelar</a>
+    </form>
+{% endblock %}

@@ -16,6 +16,14 @@ class PersonRepository extends ServiceEntityRepository
         parent::__construct($registry, Person::class);
     }
 
+    public function save(Person $person, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($person);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
     //    /**
     //     * @return Person[] Returns an array of Person objects
     //     */

@@ -1,55 +1,6 @@
 {% extends 'layout.html.twig' %}
 
-{% block meta %}
-{{ parent() }}
-<meta http-equiv="refresh" content="15">
-{% endblock %}
-
 {% block content %}
     <h1 class="display-1">{{ app_title }}</h1>
-    {% if not networks %}
-        <h2>No tiene acceso al control de ningún aula. (IP: {{ ip }})</h2>
-    {% else %}
-        <div class="row row-cols-1 row-cols-md-5 g-4">
-            {% for network in networks %}
-                {% set managed = network in networks_managed %}
-                {% if managed %}
-                    {% set class = network.ruleGroup ? 'text-bg-warning' : 'text-bg-success' %}
-                {% else %}
-                    {% set class = network.ruleGroup ? 'border-warning' : 'border-success' %}
-                {% endif %}
-                <div class="col">
-                    <div class="card {{ class }} h-100 network-group">
-                        <div class="card-header"><h2>{{ network.name }}</h2></div>
-                        <div class="card-body">
-                            {% if managed %}
-                                <form action="{{ path('frontpage_update', {'id': network.id}) }}" method="post">
-                                    <button type="submit" class="btn btn-{{ network.ruleGroup ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group">Acceso completo</button>
-                                    {% for rule_group in rule_groups %}
-                                        {% if not network.ruleGroup %}
-                                            {% set active = false %}
-                                        {% else %}
-                                            {% set active = network.ruleGroup == rule_group %}
-                                        {% endif %}
-                                        <button type="submit" class="btn btn-{{ not active ? 'light' : 'dark' }} btn w-100 mb-2" name="rule_group" value="{{ rule_group.id }}">{{ rule_group.name }}</button>
-                                    {% endfor %}
-                                </form>
-                            {% else %}
-                                {% if network.ruleGroup %}
-                                    <h4 class="card-text">{{ network.ruleGroup.name }}</h4>
-                                {% else %}
-                                    <h4 class="card-text">Acceso completo</h4>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                        {% if network.enabledAt %}
-                            <div class="card-footer">
-                                Activado {{ network.enabledAt|ago  }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    {{ component('NetworkGrid') }}
 {% endblock %}

@@ -5,68 +5,47 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Network;
-use App\Repository\NetworkRepository;
+use App\Entity\Person;
 use App\Repository\RuleGroupRepository;
-use App\Service\UniFiAPIService;
+use App\Service\NetworkAccessService;
+use App\Service\NetworkRuleGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 
 class FrontpageController extends AbstractController
 {
     public function __construct(
-        private NetworkRepository $networkRepository,
         private RuleGroupRepository $ruleGroupRepository,
-        private UniFiAPIService $uniFiAPIService
+        private NetworkAccessService $networkAccessService,
+        private NetworkRuleGroupService $networkRuleGroupService,
     ) {
     }
 
     #[Route('/', name: 'frontpage')]
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $ip = $request->getClientIp();
-        $allNetworks = $this->networkRepository->findAllOrdered();
-        $networksManaged = $this->networkRepository->findByAllowedIp($ip);
-        $ruleGroups = $this->ruleGroupRepository->findAllSelectable();
-
-        $networks = array_merge($networksManaged, $allNetworks);
-        $networks = array_unique($networks, SORT_REGULAR);
-
-        return $this->render('frontpage/index.html.twig', [
-            'networks' => $networks,
-            'networks_managed' => $networksManaged,
-            'ip' => $ip,
-            'rule_groups' => $ruleGroups
-        ]);
+        return $this->render('frontpage/index.html.twig');
     }
 
+    #[IsCsrfTokenValid('network_update', tokenKey: '_token')]
     #[Route('/update/{id}', name: 'frontpage_update', methods: ['POST'])]
     public function setRuleGroup(Request $request, Network $network): Response
     {
         $ip = $request->getClientIp();
-        $networksManaged = $this->networkRepository->findByAllowedIp($ip);
 
-        if (!in_array($network, $networksManaged, true)) {
+        if (!$this->networkAccessService->canManage($network, $ip)) {
             throw $this->createAccessDeniedException();
         }
 
         $ruleGroup = $this->ruleGroupRepository->find($request->request->get('rule_group'));
+        $user = $this->getUser();
+        $person = $user instanceof Person ? $user : null;
 
-        $network->setRuleGroup($ruleGroup);
-
-        if ($ruleGroup !== null) {
-            $network->setEnabledAt(new \DateTimeImmutable());
-            $network->setEnabledIp($ip);
-            $network->setEnabledBy(null);
-        } else {
-            $network->setEnabledAt(null);
-            $network->setEnabledIp(null);
-            $network->setEnabledBy(null);
-        }
-        $this->networkRepository->save($network, true);
-
-        $this->uniFiAPIService->updateRuleGroups();
+        $this->networkRuleGroupService->assign($network, $ruleGroup, $person, $ip);
+        $this->networkRuleGroupService->pushToUniFi();
 
         return $this->redirectToRoute('frontpage');
     }

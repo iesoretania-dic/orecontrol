@@ -1,6 +1,17 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <div class="d-flex justify-content-end p-2 gap-3 small">
+        {% if app.user %}
+            <span class="text-body-secondary">{{ app.user.userIdentifier }}</span>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_person_index') }}">Administración</a>
+            {% endif %}
+            <a href="{{ path('app_logout') }}">Cerrar sesión</a>
+        {% else %}
+            <a href="{{ path('app_login') }}">Acceso de docentes</a>
+        {% endif %}
+    </div>
     <div class="container">
     {% block content %}{% endblock %}
     </div>
