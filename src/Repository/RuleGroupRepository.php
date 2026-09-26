@@ -21,7 +21,7 @@ class RuleGroupRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('rg')
             ->andWhere('rg.selectable = :val')
             ->setParameter('val', true)
-            ->orderBy('rg.name', 'ASC')
+            ->orderBy('rg.name', \SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -32,7 +32,7 @@ class RuleGroupRepository extends ServiceEntityRepository
     public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('rg')
-            ->orderBy('rg.name', 'ASC')
+            ->orderBy('rg.name', \SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

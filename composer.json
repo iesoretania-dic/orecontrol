@@ -7,12 +7,12 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3",
-        "doctrine/doctrine-bundle": "^2.18",
-        "doctrine/doctrine-migrations-bundle": "^3.5",
-        "doctrine/orm": "^3.5",
-        "knplabs/knp-time-bundle": "^2.4",
-        "phpseclib/phpseclib": "^3.0.56",
+        "doctrine/dbal": "^3.10.6",
+        "doctrine/doctrine-bundle": "^2.19.1",
+        "doctrine/doctrine-migrations-bundle": "^3.7.1",
+        "doctrine/orm": "^3.7.2",
+        "knplabs/knp-time-bundle": "^2.5",
+        "phpseclib/phpseclib": "^3.0.57",
         "symfony/apache-pack": ">=1.0.1",
         "symfony/asset": "7.4.*",
         "symfony/asset-mapper": "7.4.*",
@@ -29,8 +29,8 @@
         "symfony/ux-icons": "^2.36.1",
         "symfony/ux-live-component": "^2.36",
         "symfony/yaml": "7.4.*",
-        "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/extra-bundle": "^2.12|^3.29",
+        "twig/twig": "^2.12|^3.30"
     },
     "config": {
         "allow-plugins": {
@@ -39,6 +39,9 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
+        "platform": {
+            "php": "8.3.0"
+        },
         "sort-packages": true
     },
     "autoload": {
@@ -85,12 +88,12 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^4.2",
+        "doctrine/doctrine-fixtures-bundle": "^4.3.1",
         "symfony/debug-bundle": "7.4.*",
         "symfony/maker-bundle": "^1.68",
         "symfony/monolog-bundle": "^3.11.2",
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
-        "zenstruck/foundry": "^2.7"
+        "zenstruck/foundry": "^2.13"
     }
 }

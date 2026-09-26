@@ -25,7 +25,7 @@ class RuleLogRepository extends ServiceEntityRepository
             ->andWhere('r.network = :network')
             ->andWhere('r.deletedAt IS NULL')
             ->setParameter('network', $network)
-            ->orderBy('r.createdAt', 'DESC')
+            ->orderBy('r.createdAt', \SortDirection::Descending)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
@@ -37,7 +37,7 @@ class RuleLogRepository extends ServiceEntityRepository
     public function findAllOrdered(int $limit = 200): array
     {
         return $this->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
+            ->orderBy('r.createdAt', \SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -73,7 +73,7 @@ class RuleLogRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->andWhere('r.network IN (:networks)')
             ->setParameter('networks', $networks)
-            ->orderBy('r.createdAt', 'DESC')
+            ->orderBy('r.createdAt', \SortDirection::Descending)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()

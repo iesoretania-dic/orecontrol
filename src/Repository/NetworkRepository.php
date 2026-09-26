@@ -21,7 +21,7 @@ class NetworkRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('n')
             ->andWhere('n.allowed_ip = :ip')
             ->setParameter('ip', $ip)
-            ->orderBy('n.name', 'ASC')
+            ->orderBy('n.name', \SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -29,7 +29,7 @@ class NetworkRepository extends ServiceEntityRepository
     public function findAllOrdered(): array
     {
         return $this->createQueryBuilder('n')
-            ->orderBy('n.name', 'ASC')
+            ->orderBy('n.name', \SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
