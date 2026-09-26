@@ -1,0 +1,67 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:cloud-download') }} Importar reglas desde UniFi</h1>
+        <a href="{{ path('admin_rule_group_index') }}" class="btn btn-link">
+            {{ ux_icon('bi:arrow-left') }} Volver a Reglas
+        </a>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-danger d-flex align-items-center gap-2">
+            {{ ux_icon('bi:exclamation-triangle-fill') }} {{ error }}
+        </div>
+    {% else %}
+        <p class="text-body-secondary">
+            Grupos de firewall que existen ahora mismo en el controlador UniFi. Los que ya están
+            importados se muestran marcados; el resto se puede añadir con un clic.
+        </p>
+
+        <div class="table-responsive-card">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Site ID</th>
+                            <th>Identificador UniFi</th>
+                            <th>Tipo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for remote in remote_groups %}
+                            {% set imported = remote._id in existing_ids %}
+                            <tr>
+                                <td>{{ remote.name }}</td>
+                                <td><code>{{ remote.site_id }}</code></td>
+                                <td><code>{{ remote._id }}</code></td>
+                                <td>{{ remote.group_type }}</td>
+                                <td class="text-end">
+                                    {% if imported %}
+                                        <span class="badge text-bg-secondary d-inline-flex align-items-center gap-1">
+                                            {{ ux_icon('bi:check-circle-fill') }} Ya importada
+                                        </span>
+                                    {% else %}
+                                        <form action="{{ path('admin_rule_group_import') }}" method="post">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('import_rule_group') }}">
+                                            <input type="hidden" name="unifi_id" value="{{ remote._id }}">
+                                            <button type="submit" class="btn btn-sm btn-dark d-inline-flex align-items-center gap-1">
+                                                {{ ux_icon('bi:download') }} Importar
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-body-secondary py-4">UniFi no tiene ningún grupo de firewall configurado.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

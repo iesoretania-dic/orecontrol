@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\RuleGroup;
 use App\Repository\RuleGroupRepository;
 use App\Repository\RuleLogRepository;
+use App\Service\UniFiAPIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ class RuleGroupController extends AbstractController
     public function __construct(
         private readonly RuleGroupRepository $ruleGroupRepository,
         private readonly RuleLogRepository $ruleLogRepository,
+        private readonly UniFiAPIService $uniFiAPIService,
     ) {
     }
 
@@ -29,6 +31,69 @@ class RuleGroupController extends AbstractController
     {
         return $this->render('admin/rule_group/index.html.twig', [
             'ruleGroups' => $this->ruleGroupRepository->findAllOrdered(),
+        ]);
+    }
+
+    #[Route('/importar', name: 'admin_rule_group_import', methods: ['GET', 'POST'])]
+    public function import(Request $request): Response
+    {
+        $error = null;
+        $remoteGroups = [];
+
+        try {
+            $remoteGroups = $this->uniFiAPIService->listFirewallGroups();
+        } catch (\RuntimeException $e) {
+            $error = $e->getMessage();
+        }
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('import_rule_group', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token.');
+            }
+
+            $uniFiId = (string) $request->request->get('unifi_id', '');
+            $remote = null;
+            foreach ($remoteGroups as $candidate) {
+                if (($candidate['_id'] ?? null) === $uniFiId) {
+                    $remote = $candidate;
+                    break;
+                }
+            }
+
+            if ($remote === null) {
+                $this->addFlash('error', 'No se ha encontrado ese grupo en UniFi.');
+            } elseif ($this->ruleGroupRepository->findOneBy(['_id' => $uniFiId]) !== null) {
+                $this->addFlash('error', 'Ese grupo ya estaba importado.');
+            } else {
+                $ruleGroup = new RuleGroup();
+                $ruleGroup->setName($remote['name'] ?? $uniFiId);
+                $ruleGroup->set_id($uniFiId);
+                $ruleGroup->setSiteId($remote['site_id'] ?? '');
+                $ruleGroup->setGroupType($remote['group_type'] ?? '');
+                // Imported but not yet exposed to teachers: an admin should review it
+                // (rename, confirm it's meant for network access control) before it
+                // shows up as a selectable option on the aula control screen.
+                $ruleGroup->setSelectable(false);
+
+                $this->ruleGroupRepository->save($ruleGroup, true);
+                $this->addFlash('success', sprintf(
+                    'Regla "%s" importada desde UniFi. Revísala y márcala como seleccionable cuando esté lista.',
+                    $ruleGroup->getName()
+                ));
+            }
+
+            return $this->redirectToRoute('admin_rule_group_import');
+        }
+
+        $existingIds = array_map(
+            static fn (RuleGroup $ruleGroup): string => $ruleGroup->get_id(),
+            $this->ruleGroupRepository->findAllOrdered()
+        );
+
+        return $this->render('admin/rule_group/import.html.twig', [
+            'error' => $error,
+            'remote_groups' => $remoteGroups,
+            'existing_ids' => $existingIds,
         ]);
     }
 

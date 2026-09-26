@@ -3,9 +3,14 @@
 {% block admin_content %}
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:shield-lock') }} Reglas</h1>
-        <a href="{{ path('admin_rule_group_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
-            {{ ux_icon('bi:plus-lg') }} Nueva regla
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_rule_group_import') }}" class="btn btn-outline-dark d-inline-flex align-items-center gap-2">
+                {{ ux_icon('bi:cloud-download') }} Importar desde UniFi
+            </a>
+            <a href="{{ path('admin_rule_group_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                {{ ux_icon('bi:plus-lg') }} Nueva regla
+            </a>
+        </div>
     </div>
 
     <div class="alert alert-warning d-flex align-items-center gap-2">
