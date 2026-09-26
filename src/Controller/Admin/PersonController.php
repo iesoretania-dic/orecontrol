@@ -183,7 +183,9 @@ class PersonController extends AbstractController
             $level = (int) $request->request->get('level', 0);
             $manager = $request->request->getBoolean('manager');
             $external = $request->request->getBoolean('external');
-            $active = $request->request->getBoolean('active', true);
+            // No default of true here: an unchecked checkbox simply isn't sent, and a
+            // default of true would make it impossible to ever turn this off.
+            $active = $request->request->getBoolean('active');
             $plainPassword = (string) $request->request->get('password', '');
 
             if ($username === '') {

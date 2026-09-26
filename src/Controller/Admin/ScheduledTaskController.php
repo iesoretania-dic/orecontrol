@@ -99,7 +99,9 @@ class ScheduledTaskController extends AbstractController
             }
 
             $name = trim((string) $request->request->get('name', ''));
-            $enabled = $request->request->getBoolean('enabled', true);
+            // No default of true here: an unchecked checkbox simply isn't sent, and a
+            // default of true would make it impossible to ever turn this off.
+            $enabled = $request->request->getBoolean('enabled');
             $allNetworks = $request->request->getBoolean('all_networks');
             $networkIds = $request->request->all('networks');
             $ruleGroupId = $request->request->get('target_rule_group');

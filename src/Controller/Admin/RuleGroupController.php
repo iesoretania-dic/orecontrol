@@ -269,7 +269,9 @@ class RuleGroupController extends AbstractController
             $siteId = trim((string) $request->request->get('site_id', ''));
             $uniFiId = trim((string) $request->request->get('unifi_id', ''));
             $groupType = trim((string) $request->request->get('group_type', ''));
-            $selectable = $request->request->getBoolean('selectable', true);
+            // No default of true here: an unchecked checkbox simply isn't sent, and a
+            // default of true would make it impossible to ever turn this off.
+            $selectable = $request->request->getBoolean('selectable');
 
             if ($name === '') {
                 $errors[] = 'El nombre no puede estar vacío.';
