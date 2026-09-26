@@ -24,6 +24,11 @@ class PersonRepository extends ServiceEntityRepository
         }
     }
 
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
     //    /**
     //     * @return Person[] Returns an array of Person objects
     //     */

@@ -3,9 +3,14 @@
 {% block admin_content %}
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <h1 class="app-page-title h4 mb-0">{{ ux_icon('bi:people-fill') }} Docentes</h1>
-        <a href="{{ path('admin_person_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
-            {{ ux_icon('bi:person-plus-fill') }} Nuevo docente
-        </a>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ path('admin_person_import') }}" class="btn btn-outline-dark d-inline-flex align-items-center gap-2">
+                {{ ux_icon('bi:file-earmark-arrow-up') }} Importar CSV
+            </a>
+            <a href="{{ path('admin_person_new') }}" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                {{ ux_icon('bi:person-plus-fill') }} Nuevo docente
+            </a>
+        </div>
     </div>
 
     <div class="table-responsive-card">

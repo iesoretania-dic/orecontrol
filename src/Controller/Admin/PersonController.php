@@ -6,7 +6,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Person;
 use App\Repository\PersonRepository;
+use App\Service\CsvReader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -18,9 +20,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class PersonController extends AbstractController
 {
+    private const CSV_USERNAME_COLUMN = 'Usuario IdEA';
+
     public function __construct(
         private readonly PersonRepository $personRepository,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly CsvReader $csvReader,
     ) {
     }
 
@@ -30,6 +35,82 @@ class PersonController extends AbstractController
         return $this->render('admin/person/index.html.twig', [
             'persons' => $this->personRepository->findBy([], ['username' => 'ASC']),
         ]);
+    }
+
+    #[Route('/importar', name: 'admin_person_import', methods: ['GET', 'POST'])]
+    public function import(Request $request): Response
+    {
+        if (!$request->isMethod('POST')) {
+            return $this->render('admin/person/import.html.twig');
+        }
+
+        if (!$this->isCsrfTokenValid('import_persons', (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $file = $request->files->get('csv');
+        if (!$file instanceof UploadedFile || !$file->isValid()) {
+            $this->addFlash('error', 'Selecciona un fichero CSV válido.');
+
+            return $this->redirectToRoute('admin_person_import');
+        }
+
+        $parsed = $this->csvReader->parse((string) file_get_contents($file->getPathname()));
+
+        if ($parsed['headers'] === []) {
+            $this->addFlash('error', 'El fichero está vacío o no se ha podido leer.');
+
+            return $this->redirectToRoute('admin_person_import');
+        }
+
+        $missing = $this->csvReader->findMissingColumn($parsed['headers'], [self::CSV_USERNAME_COLUMN]);
+        if ($missing !== null) {
+            $this->addFlash('error', sprintf('Falta la columna «%s» en el fichero.', $missing));
+
+            return $this->redirectToRoute('admin_person_import');
+        }
+
+        $created = 0;
+        $existing = 0;
+        $skipped = 0;
+
+        foreach ($parsed['rows'] as $row) {
+            $username = $row[self::CSV_USERNAME_COLUMN] ?? '';
+            if ($username === '') {
+                $skipped++;
+                continue;
+            }
+
+            $person = $this->personRepository->findOneBy(['username' => $username]);
+            if ($person !== null) {
+                $existing++;
+                continue;
+            }
+
+            $person = new Person();
+            $person->setUsername($username);
+            $person->setLevel(0);
+            $person->setManager(false);
+            $person->setActive(true);
+            // Imported teachers are new to the app by definition: they authenticate
+            // against iSéneca, never with a local password we'd have to invent.
+            $person->setExternal(true);
+            $person->setPassword(null);
+
+            $this->personRepository->save($person);
+            $created++;
+        }
+
+        $this->personRepository->flush();
+
+        $this->addFlash('success', sprintf(
+            '%d docentes importados, %d ya existían, %d filas omitidas.',
+            $created,
+            $existing,
+            $skipped
+        ));
+
+        return $this->redirectToRoute('admin_person_index');
     }
 
     #[Route('/nueva', name: 'admin_person_new', methods: ['GET', 'POST'])]
