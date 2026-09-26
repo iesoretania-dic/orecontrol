@@ -19,6 +19,7 @@
                 <thead>
                     <tr>
                         <th>Usuario</th>
+                        <th>Nombre para mostrar</th>
                         <th>Nivel</th>
                         <th>Administrador</th>
                         <th>Autenticación</th>
@@ -30,6 +31,7 @@
                     {% for person in persons %}
                         <tr>
                             <td>{{ person.username }}</td>
+                            <td>{{ person.displayName ?: '—' }}</td>
                             <td>{{ person.level }}</td>
                             <td>
                                 {% if person.manager %}
@@ -64,7 +66,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center text-body-secondary py-4">No hay docentes dados de alta todavía.</td>
+                            <td colspan="7" class="text-center text-body-secondary py-4">No hay docentes dados de alta todavía.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

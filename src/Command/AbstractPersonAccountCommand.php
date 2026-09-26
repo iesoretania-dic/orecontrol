@@ -36,6 +36,7 @@ abstract class AbstractPersonAccountCommand extends Command
     {
         $this
             ->addArgument('username', InputArgument::REQUIRED, 'Usuario del docente')
+            ->addOption('display-name', null, InputOption::VALUE_REQUIRED, 'Nombre para mostrar (por defecto, el usuario)')
             ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Contraseña local (se pedirá de forma interactiva si se omite)')
             ->addOption('external', null, InputOption::VALUE_NONE, 'Autenticar contra iSéneca en vez de con contraseña local')
             ->addOption('level', null, InputOption::VALUE_REQUIRED, 'Nivel del docente', '0')
@@ -66,6 +67,11 @@ abstract class AbstractPersonAccountCommand extends Command
         $person->setManager($this->isManager());
         $person->setActive(true);
         $person->setExternal($external);
+
+        $displayName = $input->getOption('display-name');
+        if ($displayName !== null) {
+            $person->setDisplayName(trim($displayName) !== '' ? trim($displayName) : null);
+        }
 
         if ($external) {
             $person->setPassword(null);

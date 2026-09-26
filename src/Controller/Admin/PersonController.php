@@ -21,6 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PersonController extends AbstractController
 {
     private const CSV_USERNAME_COLUMN = 'Usuario IdEA';
+    private const CSV_NAME_COLUMN = 'Empleado/a';
 
     public function __construct(
         private readonly PersonRepository $personRepository,
@@ -89,6 +90,7 @@ class PersonController extends AbstractController
 
             $person = new Person();
             $person->setUsername($username);
+            $person->setDisplayName($this->parseDisplayName($row[self::CSV_NAME_COLUMN] ?? ''));
             $person->setLevel(0);
             $person->setManager(false);
             $person->setActive(true);
@@ -111,6 +113,25 @@ class PersonController extends AbstractController
         ));
 
         return $this->redirectToRoute('admin_person_index');
+    }
+
+    /** Turns "Apellidos, Nombre" (as exported by iSéneca) into "Nombre Apellidos". */
+    private function parseDisplayName(string $fullName): ?string
+    {
+        $fullName = trim($fullName);
+        if ($fullName === '') {
+            return null;
+        }
+
+        $parts = explode(',', $fullName, 2);
+        if (count($parts) !== 2) {
+            return $fullName;
+        }
+
+        $lastName = trim($parts[0]);
+        $firstName = trim($parts[1]);
+
+        return trim($firstName . ' ' . $lastName);
     }
 
     #[Route('/nueva', name: 'admin_person_new', methods: ['GET', 'POST'])]
@@ -158,6 +179,7 @@ class PersonController extends AbstractController
             }
 
             $username = trim((string) $request->request->get('username', ''));
+            $displayName = trim((string) $request->request->get('display_name', ''));
             $level = (int) $request->request->get('level', 0);
             $manager = $request->request->getBoolean('manager');
             $external = $request->request->getBoolean('external');
@@ -179,6 +201,7 @@ class PersonController extends AbstractController
 
             if ($errors === []) {
                 $person->setUsername($username);
+                $person->setDisplayName($displayName !== '' ? $displayName : null);
                 $person->setLevel($level);
                 $person->setManager($manager);
                 $person->setExternal($external);

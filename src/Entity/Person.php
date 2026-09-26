@@ -18,6 +18,9 @@ class Person implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, unique: true)]
     private ?string $username = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $displayName = null;
+
     #[ORM\Column]
     private ?int $level = null;
 
@@ -48,6 +51,24 @@ class Person implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
 
         return $this;
+    }
+
+    public function getDisplayName(): ?string
+    {
+        return $this->displayName;
+    }
+
+    public function setDisplayName(?string $displayName): static
+    {
+        $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    /** The name to show in the UI: displayName if set, otherwise the username. */
+    public function getDisplayLabel(): string
+    {
+        return $this->displayName !== null && $this->displayName !== '' ? $this->displayName : (string) $this->username;
     }
 
     public function getLevel(): ?int

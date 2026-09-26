@@ -24,7 +24,7 @@
                                 <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
                                     {{ ux_icon(log.createdBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
                                     {% if log.createdBy %}
-                                        {{ log.createdBy.username }}
+                                        {{ log.createdBy.displayLabel }}
                                     {% else %}
                                         IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
                                     {% endif %}
@@ -36,7 +36,7 @@
                                     <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
                                         {{ ux_icon(log.deletedBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
                                         {% if log.deletedBy %}
-                                            {{ log.deletedBy.username }}
+                                            {{ log.deletedBy.displayLabel }}
                                         {% else %}
                                             IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
                                         {% endif %}
