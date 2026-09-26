@@ -2,14 +2,16 @@
 
 {% block admin_content %}
     <h1 class="app-page-title h4 mb-3">
-        {{ ux_icon(is_new ? 'bi:plus-lg' : 'bi:pencil-fill') }}
-        {{ is_new ? 'Nueva regla' : 'Editar regla' }}
+        {{ ux_icon(is_new ? 'bi:link-45deg' : 'bi:pencil-fill') }}
+        {{ is_new ? 'Enlazar regla existente' : 'Editar regla' }}
     </h1>
 
     <div class="alert alert-warning d-flex align-items-center gap-2">
-        {{ ux_icon('bi:exclamation-triangle-fill') }}
-        El <code>site_id</code> y el identificador deben coincidir con un grupo de firewall que ya
-        exista en el controlador UniFi. Guardar aquí no lo crea allí.
+        {{ ux_icon('bi:exclamation-triangle-fill', {class: 'flex-shrink-0'}) }}
+        <span>
+            El <code>site_id</code> y el identificador deben coincidir con un grupo de firewall que ya
+            exista en el controlador UniFi. Guardar aquí no lo crea allí.
+        </span>
     </div>
 
     {% for error in errors %}

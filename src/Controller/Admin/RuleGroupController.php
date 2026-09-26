@@ -97,6 +97,100 @@ class RuleGroupController extends AbstractController
         ]);
     }
 
+    #[Route('/crear-en-unifi', name: 'admin_rule_group_create_remote', methods: ['GET', 'POST'])]
+    public function createRemote(Request $request): Response
+    {
+        $errors = [];
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('create_remote_rule_group', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token.');
+            }
+
+            $name = trim((string) $request->request->get('name', ''));
+            $groupType = trim((string) $request->request->get('group_type', 'address-group'));
+            $members = preg_split('/\r\n|\r|\n/', (string) $request->request->get('members', ''));
+            $members = array_values(array_filter(array_map('trim', $members), static fn (string $line): bool => $line !== ''));
+
+            if ($name === '') {
+                $errors[] = 'El nombre no puede estar vacío.';
+            }
+            if ($groupType === '') {
+                $errors[] = 'El tipo de grupo no puede estar vacío.';
+            }
+
+            if ($errors === []) {
+                try {
+                    $created = $this->uniFiAPIService->createFirewallGroup($name, $groupType, $members);
+
+                    $ruleGroup = new RuleGroup();
+                    $ruleGroup->setName($created['name'] ?? $name);
+                    $ruleGroup->set_id($created['_id']);
+                    $ruleGroup->setSiteId($created['site_id'] ?? '');
+                    $ruleGroup->setGroupType($created['group_type'] ?? $groupType);
+                    // Same reasoning as importing: created but not yet exposed to teachers
+                    // until an admin reviews and marks it selectable.
+                    $ruleGroup->setSelectable(false);
+
+                    $this->ruleGroupRepository->save($ruleGroup, true);
+                    $this->addFlash('success', sprintf(
+                        'Regla "%s" creada en UniFi y registrada aquí. Márcala como seleccionable cuando esté lista.',
+                        $ruleGroup->getName()
+                    ));
+
+                    return $this->redirectToRoute('admin_rule_group_edit', ['id' => $ruleGroup->getId()]);
+                } catch (\RuntimeException $e) {
+                    $errors[] = $e->getMessage();
+                }
+            }
+        }
+
+        return $this->render('admin/rule_group/create_remote.html.twig', [
+            'errors' => $errors,
+            'name' => (string) $request->request->get('name', ''),
+            'group_type' => (string) $request->request->get('group_type', 'address-group'),
+            'members' => (string) $request->request->get('members', ''),
+        ]);
+    }
+
+    #[Route('/{id}/miembros', name: 'admin_rule_group_members', methods: ['GET', 'POST'])]
+    public function members(Request $request, RuleGroup $ruleGroup): Response
+    {
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('rule_group_members', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token.');
+            }
+
+            $members = preg_split('/\r\n|\r|\n/', (string) $request->request->get('members', ''));
+            $members = array_values(array_filter(array_map('trim', $members), static fn (string $line): bool => $line !== ''));
+
+            try {
+                $this->uniFiAPIService->setGroupMembers($ruleGroup, $members);
+                $this->addFlash('success', sprintf('Miembros de "%s" guardados en UniFi.', $ruleGroup->getName()));
+            } catch (\RuntimeException $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
+
+            return $this->redirectToRoute('admin_rule_group_members', ['id' => $ruleGroup->getId()]);
+        }
+
+        $error = null;
+        $members = [];
+
+        try {
+            $remote = $this->uniFiAPIService->getFirewallGroup($ruleGroup);
+            $members = $remote['group_members'] ?? [];
+        } catch (\RuntimeException $e) {
+            $error = $e->getMessage();
+        }
+
+        return $this->render('admin/rule_group/members.html.twig', [
+            'ruleGroup' => $ruleGroup,
+            'error' => $error,
+            'members' => $members,
+        ]);
+    }
+
     #[Route('/nueva', name: 'admin_rule_group_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {

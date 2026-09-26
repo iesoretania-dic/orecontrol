@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="app-page-title h4 mb-3">{{ ux_icon('bi:cloud-plus') }} Crear regla en UniFi</h1>
+
+    <div class="alert alert-info d-flex align-items-center gap-2">
+        {{ ux_icon('bi:info-circle-fill', {class: 'flex-shrink-0'}) }}
+        <span>
+            Esto crea un grupo de firewall nuevo directamente en el controlador UniFi y lo registra
+            aquí a la vez, con el <code>site_id</code> e identificador que UniFi le asigne: no hace
+            falta copiar nada a mano.
+        </span>
+    </div>
+
+    {% for error in errors %}
+        <div class="alert alert-danger d-flex align-items-center gap-2">{{ ux_icon('bi:exclamation-triangle-fill') }} {{ error }}</div>
+    {% endfor %}
+
+    <div class="app-surface p-4 col-12 col-md-7 col-lg-6">
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_remote_rule_group') }}">
+
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" id="name" name="name" value="{{ name }}" class="form-control" required placeholder="Ej. Sin redes sociales">
+            </div>
+
+            <div class="mb-3">
+                <label for="group_type" class="form-label">Tipo de grupo</label>
+                <input type="text" id="group_type" name="group_type" value="{{ group_type }}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="members" class="form-label">Miembros iniciales (opcional, una IP/CIDR por línea)</label>
+                <textarea id="members" name="members" class="form-control" rows="6" style="font-family: monospace;">{{ members }}</textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark d-inline-flex align-items-center gap-2">
+                    {{ ux_icon('bi:cloud-plus') }} Crear en UniFi
+                </button>
+                <a href="{{ path('admin_rule_group_index') }}" class="btn btn-link">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

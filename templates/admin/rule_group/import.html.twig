@@ -10,7 +10,7 @@
 
     {% if error %}
         <div class="alert alert-danger d-flex align-items-center gap-2">
-            {{ ux_icon('bi:exclamation-triangle-fill') }} {{ error }}
+            {{ ux_icon('bi:exclamation-triangle-fill', {class: 'flex-shrink-0'}) }} <span>{{ error }}</span>
         </div>
     {% else %}
         <p class="text-body-secondary">
