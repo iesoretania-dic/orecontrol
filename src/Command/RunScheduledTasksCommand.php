@@ -59,7 +59,7 @@ final class RunScheduledTasksCommand extends Command
 
                 $networks = $task->isAllNetworks() ? $this->networkRepository->findAllOrdered() : $task->getNetworks()->toArray();
                 foreach ($networks as $network) {
-                    $this->ruleGroupService->assign($network, $task->getTargetRuleGroup(), null, null);
+                    $this->ruleGroupService->assign($network, $task->getTargetRuleGroup(), null, null, $task);
                 }
 
                 $task->setLastRunAt($now);

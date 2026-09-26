@@ -8,6 +8,7 @@ use App\Entity\Network;
 use App\Entity\Person;
 use App\Entity\RuleGroup;
 use App\Entity\RuleLog;
+use App\Entity\ScheduledTask;
 use App\Repository\NetworkRepository;
 use App\Repository\RuleLogRepository;
 
@@ -20,10 +21,10 @@ class NetworkRuleGroupService
     ) {
     }
 
-    public function assign(Network $network, ?RuleGroup $ruleGroup, ?Person $enabledBy, ?string $enabledIp): void
+    public function assign(Network $network, ?RuleGroup $ruleGroup, ?Person $enabledBy, ?string $enabledIp, ?ScheduledTask $scheduledTask = null): void
     {
         if ($network->getRuleGroup() !== $ruleGroup) {
-            $this->logChange($network, $ruleGroup, $enabledBy, $enabledIp);
+            $this->logChange($network, $ruleGroup, $enabledBy, $enabledIp, $scheduledTask);
         }
 
         $network->setRuleGroup($ruleGroup);
@@ -46,7 +47,7 @@ class NetworkRuleGroupService
      * rule_log always shows who/where activated or deactivated a rule, and when. A change
      * made from an authorised IP without a logged-in teacher leaves the "who" side null.
      */
-    private function logChange(Network $network, ?RuleGroup $ruleGroup, ?Person $actor, ?string $actorIp): void
+    private function logChange(Network $network, ?RuleGroup $ruleGroup, ?Person $actor, ?string $actorIp, ?ScheduledTask $scheduledTask): void
     {
         $now = new \DateTimeImmutable();
 
@@ -55,6 +56,8 @@ class NetworkRuleGroupService
             $openLog->setDeletedAt($now);
             $openLog->setDeletedBy($actor);
             $openLog->setDeletedIp($actorIp);
+            $openLog->setDeletedScheduledTask($scheduledTask);
+            $openLog->setDeletedViaScheduledTask($scheduledTask !== null);
             $this->ruleLogRepository->save($openLog);
         }
 
@@ -64,6 +67,8 @@ class NetworkRuleGroupService
         $newLog->setCreatedAt($now);
         $newLog->setCreatedBy($actor);
         $newLog->setCreatedIp($actorIp);
+        $newLog->setCreatedScheduledTask($scheduledTask);
+        $newLog->setCreatedViaScheduledTask($scheduledTask !== null);
         $this->ruleLogRepository->save($newLog);
     }
 

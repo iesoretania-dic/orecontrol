@@ -34,6 +34,15 @@ class RuleLog
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $createdIp = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?ScheduledTask $createdScheduledTask = null;
+
+    // Kept even after createdScheduledTask turns NULL (task deleted), so the history
+    // can still say "tarea programada" instead of falling back to "IP autorizada".
+    #[ORM\Column]
+    private bool $createdViaScheduledTask = false;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
@@ -42,6 +51,13 @@ class RuleLog
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $deletedIp = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?ScheduledTask $deletedScheduledTask = null;
+
+    #[ORM\Column]
+    private bool $deletedViaScheduledTask = false;
 
     public function getId(): ?int
     {
@@ -108,6 +124,30 @@ class RuleLog
         return $this;
     }
 
+    public function getCreatedScheduledTask(): ?ScheduledTask
+    {
+        return $this->createdScheduledTask;
+    }
+
+    public function setCreatedScheduledTask(?ScheduledTask $createdScheduledTask): static
+    {
+        $this->createdScheduledTask = $createdScheduledTask;
+
+        return $this;
+    }
+
+    public function isCreatedViaScheduledTask(): bool
+    {
+        return $this->createdViaScheduledTask;
+    }
+
+    public function setCreatedViaScheduledTask(bool $createdViaScheduledTask): static
+    {
+        $this->createdViaScheduledTask = $createdViaScheduledTask;
+
+        return $this;
+    }
+
     public function getDeletedAt(): ?\DateTimeImmutable
     {
         return $this->deletedAt;
@@ -140,6 +180,30 @@ class RuleLog
     public function setDeletedIp(?string $deletedIp): static
     {
         $this->deletedIp = $deletedIp;
+
+        return $this;
+    }
+
+    public function getDeletedScheduledTask(): ?ScheduledTask
+    {
+        return $this->deletedScheduledTask;
+    }
+
+    public function setDeletedScheduledTask(?ScheduledTask $deletedScheduledTask): static
+    {
+        $this->deletedScheduledTask = $deletedScheduledTask;
+
+        return $this;
+    }
+
+    public function isDeletedViaScheduledTask(): bool
+    {
+        return $this->deletedViaScheduledTask;
+    }
+
+    public function setDeletedViaScheduledTask(bool $deletedViaScheduledTask): static
+    {
+        $this->deletedViaScheduledTask = $deletedViaScheduledTask;
 
         return $this;
     }

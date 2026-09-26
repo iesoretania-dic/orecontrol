@@ -22,11 +22,12 @@
                             <td>
                                 {{ log.createdAt|date('d/m/Y H:i') }}<br>
                                 <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
-                                    {{ ux_icon(log.createdBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
                                     {% if log.createdBy %}
-                                        {{ log.createdBy.displayLabel }}
+                                        {{ ux_icon('bi:person-fill') }} {{ log.createdBy.displayLabel }}
+                                    {% elseif log.createdViaScheduledTask %}
+                                        {{ ux_icon('bi:calendar2-week-fill') }} Tarea programada{{ log.createdScheduledTask ? ' "' ~ log.createdScheduledTask.name ~ '"' : ' (eliminada)' }}
                                     {% else %}
-                                        IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
+                                        {{ ux_icon('bi:hdd-network-fill') }} IP autorizada{{ log.createdIp ? ' (' ~ log.createdIp ~ ')' : '' }}
                                     {% endif %}
                                 </span>
                             </td>
@@ -34,11 +35,12 @@
                                 {% if log.deletedAt %}
                                     {{ log.deletedAt|date('d/m/Y H:i') }}<br>
                                     <span class="text-body-secondary small d-inline-flex align-items-center gap-1">
-                                        {{ ux_icon(log.deletedBy ? 'bi:person-fill' : 'bi:hdd-network-fill') }}
                                         {% if log.deletedBy %}
-                                            {{ log.deletedBy.displayLabel }}
+                                            {{ ux_icon('bi:person-fill') }} {{ log.deletedBy.displayLabel }}
+                                        {% elseif log.deletedViaScheduledTask %}
+                                            {{ ux_icon('bi:calendar2-week-fill') }} Tarea programada{{ log.deletedScheduledTask ? ' "' ~ log.deletedScheduledTask.name ~ '"' : ' (eliminada)' }}
                                         {% else %}
-                                            IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
+                                            {{ ux_icon('bi:hdd-network-fill') }} IP autorizada{{ log.deletedIp ? ' (' ~ log.deletedIp ~ ')' : '' }}
                                         {% endif %}
                                     </span>
                                 {% else %}
