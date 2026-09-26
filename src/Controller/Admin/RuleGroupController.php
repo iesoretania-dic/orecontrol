@@ -203,32 +203,56 @@ class RuleGroupController extends AbstractController
         return $this->handleForm($request, $ruleGroup);
     }
 
-    #[IsCsrfTokenValid('delete_rule_group', tokenKey: '_token')]
-    #[Route('/{id}/eliminar', name: 'admin_rule_group_delete', methods: ['POST'])]
-    public function delete(RuleGroup $ruleGroup): Response
+    #[Route('/{id}/eliminar', name: 'admin_rule_group_delete', methods: ['GET', 'POST'])]
+    public function delete(Request $request, RuleGroup $ruleGroup): Response
     {
-        if (!$ruleGroup->getNetworks()->isEmpty()) {
-            $this->addFlash('error', sprintf(
-                'No se puede eliminar "%s": hay aulas que la tienen asignada actualmente.',
-                $ruleGroup->getName()
-            ));
+        $blockedReason = $this->blockedFromDeletion($ruleGroup);
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('delete_rule_group', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException('Invalid CSRF token.');
+            }
+
+            if ($blockedReason !== null) {
+                $this->addFlash('error', $blockedReason);
+
+                return $this->redirectToRoute('admin_rule_group_index');
+            }
+
+            if ($request->request->getBoolean('delete_remote')) {
+                try {
+                    $this->uniFiAPIService->deleteFirewallGroup($ruleGroup);
+                } catch (\RuntimeException $e) {
+                    $this->addFlash('error', $e->getMessage() . ' No se ha eliminado tampoco aquí, para no perder la referencia.');
+
+                    return $this->redirectToRoute('admin_rule_group_delete', ['id' => $ruleGroup->getId()]);
+                }
+            }
+
+            $name = $ruleGroup->getName();
+            $this->ruleGroupRepository->remove($ruleGroup, true);
+            $this->addFlash('success', sprintf('Regla "%s" eliminada.', $name));
 
             return $this->redirectToRoute('admin_rule_group_index');
+        }
+
+        return $this->render('admin/rule_group/delete.html.twig', [
+            'ruleGroup' => $ruleGroup,
+            'blocked_reason' => $blockedReason,
+        ]);
+    }
+
+    private function blockedFromDeletion(RuleGroup $ruleGroup): ?string
+    {
+        if (!$ruleGroup->getNetworks()->isEmpty()) {
+            return sprintf('No se puede eliminar "%s": hay aulas que la tienen asignada actualmente.', $ruleGroup->getName());
         }
 
         if ($this->ruleLogRepository->existsForRuleGroup($ruleGroup)) {
-            $this->addFlash('error', sprintf(
-                'No se puede eliminar "%s": aparece en el historial de accesos.',
-                $ruleGroup->getName()
-            ));
-
-            return $this->redirectToRoute('admin_rule_group_index');
+            return sprintf('No se puede eliminar "%s": aparece en el historial de accesos.', $ruleGroup->getName());
         }
 
-        $this->ruleGroupRepository->remove($ruleGroup, true);
-        $this->addFlash('success', sprintf('Regla "%s" eliminada.', $ruleGroup->getName()));
-
-        return $this->redirectToRoute('admin_rule_group_index');
+        return null;
     }
 
     private function handleForm(Request $request, RuleGroup $ruleGroup): Response

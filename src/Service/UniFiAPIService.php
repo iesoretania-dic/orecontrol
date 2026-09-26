@@ -163,6 +163,34 @@ class UniFiAPIService
     }
 
     /**
+     * Deletes a firewall group from the UniFi controller. The app never does this on
+     * its own: it's only ever invoked when an admin explicitly asks to remove a rule
+     * that is no longer in use locally.
+     *
+     * @throws \RuntimeException if the controller cannot be reached or refuses the request
+     */
+    public function deleteFirewallGroup(RuleGroup $ruleGroup): void
+    {
+        try {
+            $this->client->request(
+                'DELETE',
+                'https://' . $this->containerBag->get('unifi.server_host') . '/proxy/network/api/s/default/rest/firewallgroup/' . $ruleGroup->get_id(),
+                [
+                    'headers' => [
+                        'Accept' => 'application/json',
+                        'X-API-KEY' => $this->containerBag->get('unifi.api_key'),
+                    ],
+                    'verify_peer' => false,
+                    'verify_host' => false,
+                    'timeout' => 10,
+                ]
+            )->getStatusCode();
+        } catch (ExceptionInterface $e) {
+            throw new \RuntimeException('No se ha podido eliminar el grupo en el controlador UniFi.', previous: $e);
+        }
+    }
+
+    /**
      * @param string[] $groupMembers
      */
     private function putFirewallGroup(RuleGroup $ruleGroup, array $groupMembers): void

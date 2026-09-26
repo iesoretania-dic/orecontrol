@@ -1,0 +1,44 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_content %}
+    <h1 class="app-page-title h4 mb-3">{{ ux_icon('bi:trash-fill') }} Eliminar "{{ ruleGroup.name }}"</h1>
+
+    {% if blocked_reason %}
+        <div class="alert alert-danger d-flex align-items-center gap-2">
+            {{ ux_icon('bi:exclamation-triangle-fill', {class: 'flex-shrink-0'}) }} <span>{{ blocked_reason }}</span>
+        </div>
+        <a href="{{ path('admin_rule_group_index') }}" class="btn btn-link">
+            {{ ux_icon('bi:arrow-left') }} Volver a Reglas
+        </a>
+    {% else %}
+        <div class="app-surface p-4 col-12 col-md-7 col-lg-6">
+            <p>
+                No hay ninguna aula que la tenga asignada ni aparece en el historial: se puede
+                eliminar sin problema aquí.
+            </p>
+
+            <form method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_rule_group') }}">
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" id="delete_remote" name="delete_remote" value="1" class="form-check-input">
+                    <label for="delete_remote" class="form-check-label">
+                        {{ ux_icon('bi:cloud-slash') }} Eliminar también el grupo <code>{{ ruleGroup._id }}</code> en el controlador UniFi
+                    </label>
+                    <div class="form-text">
+                        Márcalo solo si este grupo ya no se usa para nada más en UniFi. Si falla la
+                        conexión con el controlador, no se elimina en ningún sitio para no perder la
+                        referencia.
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger d-inline-flex align-items-center gap-2">
+                        {{ ux_icon('bi:trash-fill') }} Eliminar
+                    </button>
+                    <a href="{{ path('admin_rule_group_index') }}" class="btn btn-link">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}

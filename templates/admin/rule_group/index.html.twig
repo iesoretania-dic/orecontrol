@@ -61,12 +61,9 @@
                                 <a href="{{ path('admin_rule_group_edit', {id: ruleGroup.id}) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
                                     {{ ux_icon('bi:pencil-fill') }}
                                 </a>
-                                <form action="{{ path('admin_rule_group_delete', {id: ruleGroup.id}) }}" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta regla?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_rule_group') }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                        {{ ux_icon('bi:trash-fill') }}
-                                    </button>
-                                </form>
+                                <a href="{{ path('admin_rule_group_delete', {id: ruleGroup.id}) }}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    {{ ux_icon('bi:trash-fill') }}
+                                </a>
                             </td>
                         </tr>
                     {% else %}
